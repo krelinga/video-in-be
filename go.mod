@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250512135634-96ef563906bf.1
-	buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250512135634-96ef563906bf.1
+	buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250512161936-f2d0e8207bcf.1
 	golang.org/x/net v0.23.0
 )
 
