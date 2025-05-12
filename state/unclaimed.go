@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"connectrpc.com/connect"
@@ -16,6 +17,7 @@ var (
 	ErrUnclaimedDirNotFound = connect.NewError(connect.CodeNotFound, errors.New("unclaimed directory not found"))
 	ErrUnclaimedDirMoveFailed  = connect.NewError(connect.CodeDataLoss, errors.New("unclaimed directory move failed"))
 	ErrUnknownProject = connect.NewError(connect.CodeNotFound, errors.New("unknown project"))
+	ErrMkProjectDirFailed = connect.NewError(connect.CodeInternal, errors.New("failed to create project directory"))
 )
 
 func listUnclaimedDirs() []string {
@@ -60,8 +62,11 @@ func ProjectAssignDiskDirs(project string, dirs []string) error {
 		for _, p := range projects {
 			if p.Name == project {
 				for _, dir := range dirs {
-					mvErr := os.Rename(env.UnclaimedDir()+"/"+dir, env.StateDir()+"/"+project+"/"+dir)
-					if mvErr != nil {
+					if mkDirErr := os.MkdirAll(ProjectDir(project), 0644); mkDirErr != nil {
+						err = ErrMkProjectDirFailed
+						return
+					}
+					if mvErr := os.Rename(filepath.Join(env.UnclaimedDir(), dir), filepath.Join(ProjectDir(project), dir)); mvErr != nil {
 						err = ErrUnclaimedDirMoveFailed
 						return
 					}

@@ -1,6 +1,7 @@
 package state
 
 import (
+	"path/filepath"
 	"sync"
 
 	"github.com/krelinga/video-in-be/env"
@@ -28,4 +29,8 @@ func ProjectsModify(fn func([]*Project) []*Project) {
 	projects := read[Project](projectPath())
 	projects = fn(projects)
 	write(projectPath(), projects)
+}
+
+func ProjectDir(project string) string {
+	return filepath.Join(env.ProjectDir(), project)
 }
