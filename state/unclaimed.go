@@ -14,10 +14,10 @@ import (
 var unclaimedMutex = &sync.RWMutex{}
 
 var (
-	ErrUnclaimedDirNotFound = connect.NewError(connect.CodeNotFound, errors.New("unclaimed directory not found"))
-	ErrUnclaimedDirMoveFailed  = connect.NewError(connect.CodeDataLoss, errors.New("unclaimed directory move failed"))
-	ErrUnknownProject = connect.NewError(connect.CodeNotFound, errors.New("unknown project"))
-	ErrMkProjectDirFailed = connect.NewError(connect.CodeInternal, errors.New("failed to create project directory"))
+	ErrUnclaimedDirNotFound   = connect.NewError(connect.CodeNotFound, errors.New("unclaimed directory not found"))
+	ErrUnclaimedDirMoveFailed = connect.NewError(connect.CodeDataLoss, errors.New("unclaimed directory move failed"))
+	ErrUnknownProject         = connect.NewError(connect.CodeNotFound, errors.New("unknown project"))
+	ErrMkProjectDirFailed     = connect.NewError(connect.CodeInternal, errors.New("failed to create project directory"))
 )
 
 func listUnclaimedDirs() []string {
@@ -34,7 +34,7 @@ func listUnclaimedDirs() []string {
 	return dirs
 }
 
-func UnclaimedDiscDirRead(f func( []string)) {
+func UnclaimedDiscDirRead(f func([]string)) {
 	unclaimedMutex.RLock()
 	defer unclaimedMutex.RUnlock()
 
@@ -62,7 +62,7 @@ func ProjectAssignDiskDirs(project string, dirs []string) error {
 		for _, p := range projects {
 			if p.Name == project {
 				for _, dir := range dirs {
-					if mkDirErr := os.MkdirAll(ProjectDir(project), 0644); mkDirErr != nil {
+					if mkDirErr := os.MkdirAll(ProjectDir(project), 0755); mkDirErr != nil {
 						err = ErrMkProjectDirFailed
 						return
 					}
