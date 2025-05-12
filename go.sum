@@ -1,5 +1,7 @@
 buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250512135634-96ef563906bf.1 h1:uJfbRd05UKhkrxdWD7617gyAfAa4kIs0EzuYn5DPXbw=
 buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250512135634-96ef563906bf.1/go.mod h1:BaE7GGsHv2PlcUVfSIh+p9xENRvNMh7aoYA9WTLxoT4=
+buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250512161936-f2d0e8207bcf.1 h1:0ojr6i/Gi/qb0qUesQO7M+oDPB28O6lk81ZjDKxXdzY=
+buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250512161936-f2d0e8207bcf.1/go.mod h1:QGOzw8i3ptp5w1aMXMHwGfYj/IhsFOwE/Ml6YopSN+Y=
 buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250512135634-96ef563906bf.1 h1:8Laa+V3HyajfiamB5CWC+xBbJSrNU+/GlyQgr5jtxqE=
 buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250512135634-96ef563906bf.1/go.mod h1:PqxitTX1ULoPF06kX+gSpmfN7phaJ7qOHjXI7q8PGOI=
 buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250512161936-f2d0e8207bcf.1 h1:w7NoxUyAsSp4TLTD8ModYvdfTzVt+HVL0v0rctTACVs=
