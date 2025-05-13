@@ -68,6 +68,9 @@ func ProjectAssignDiskDirs(projectName string, dirs []string) error {
 				err = ErrUnclaimedDirMoveFailed
 				return
 			}
+			if project.Thumbs == nil {
+				project.Thumbs = make(map[string]ThumbState)
+			}
 			project.Thumbs[dir] = ThumbStateNone
 		}
 	})
