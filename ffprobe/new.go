@@ -3,7 +3,14 @@ package ffprobe
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"os/exec"
+)
+
+var (
+	ErrFFProbe = errors.New("ffprobe error")
+	ErrJson    = errors.New("could not decode ffprobe output as json")
 )
 
 func New(path string) (*FFProbe, error) {
@@ -12,12 +19,12 @@ func New(path string) (*FFProbe, error) {
 	cmd.Stdout = &stdout
 
 	if err := cmd.Run(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %w", ErrFFProbe, err)
 	}
 
 	var result Raw
 	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %w", ErrJson, err)
 	}
 
 	return &FFProbe{Raw: &result}, nil
