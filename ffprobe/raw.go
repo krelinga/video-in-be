@@ -11,5 +11,5 @@ type RawStream struct {
 }
 
 type RawFormat struct {
-	Duration		float64 `json:"duration"`
+	Duration		string `json:"duration"`
 }

@@ -27,9 +27,9 @@ func (f *FFProbe) GetDuration() (time.Duration, bool) {
 	if f.Raw == nil || f.Raw.Format == nil {
 		return 0, false
 	}
-	d, err := time.ParseDuration(fmt.Sprintf("%fs", f.Raw.Format.Duration))
+	d, err := time.ParseDuration(fmt.Sprintf("%ss", f.Raw.Format.Duration))
 	if err != nil {
-		panic(fmt.Sprintf("error parsing duration %f : %v", f.Raw.Format.Duration, err))
+		panic(fmt.Sprintf("error parsing duration %s : %v", f.Raw.Format.Duration, err))
 	}
 	return d, true
 }
