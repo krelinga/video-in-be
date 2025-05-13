@@ -7,6 +7,7 @@ import (
 	pb "buf.build/gen/go/krelinga/proto/protocolbuffers/go/krelinga/video/in/v1"
 	"connectrpc.com/connect"
 	"github.com/krelinga/video-in-be/state"
+	"github.com/krelinga/video-in-be/thumbs"
 )
 
 var (
@@ -47,6 +48,41 @@ func (*ConnectService) ProjectNew(ctx context.Context, req *connect.Request[pb.P
 		})
 		return projects
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Return the response
+	return connect.NewResponse(response), nil
+}
+
+func (*ConnectService) ProjectGet(ctx context.Context, req *connect.Request[pb.ProjectGetRequest]) (*connect.Response[pb.ProjectGetResponse], error) {
+	// Create a new ProjectGetResponse
+	response := &pb.ProjectGetResponse{}
+
+	// Get the project
+	var err error
+	found := state.ProjectRead(req.Msg.Project, func(project *state.Project) {
+		response.Project = project.Name
+		for disc, thumbState := range project.Thumbs {
+			d := &pb.ProjectDisc{
+				Project:    project.Name,
+				Disc:       disc,
+				ThumbState: string(thumbState),
+			}
+			response.Discs = append(response.Discs, d)
+			if thumbState == state.ThumbStateDone {
+				d.Thumbs, err = thumbs.List(project.Name, disc)
+				if err != nil {
+					err = connect.NewError(connect.CodeInternal, err)
+					return
+				}
+			}
+		}
+	})
+	if !found {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
+	}
 	if err != nil {
 		return nil, err
 	}
