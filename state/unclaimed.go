@@ -41,7 +41,7 @@ func UnclaimedDiscDirRead(f func([]string)) {
 	f(listUnclaimedDirs())
 }
 
-func ProjectAssignDiskDirs(project string, dirs []string) error {
+func ProjectAssignDiskDirs(projectName string, dirs []string) error {
 	unclaimedMutex.Lock()
 	defer unclaimedMutex.Unlock()
 
@@ -58,24 +58,22 @@ func ProjectAssignDiskDirs(project string, dirs []string) error {
 
 	// Make sure the project exists and do the move
 	var err error
-	ProjectsRead(func(projects []*Project) {
-		for _, p := range projects {
-			if p.Name == project {
-				for _, dir := range dirs {
-					if mkDirErr := os.MkdirAll(ProjectDir(project), 0755); mkDirErr != nil {
-						err = ErrMkProjectDirFailed
-						return
-					}
-					if mvErr := os.Rename(filepath.Join(env.UnclaimedDir(), dir), filepath.Join(ProjectDir(project), dir)); mvErr != nil {
-						err = ErrUnclaimedDirMoveFailed
-						return
-					}
-				}
+	found := ProjectModify(projectName, func(project *Project) {
+		for _, dir := range dirs {
+			if mkDirErr := os.MkdirAll(ProjectDir(projectName), 0755); mkDirErr != nil {
+				err = ErrMkProjectDirFailed
 				return
 			}
+			if mvErr := os.Rename(filepath.Join(env.UnclaimedDir(), dir), filepath.Join(ProjectDir(projectName), dir)); mvErr != nil {
+				err = ErrUnclaimedDirMoveFailed
+				return
+			}
+			project.Thumbs[dir] = ThumbStateNone
 		}
-		err = ErrUnknownProject
 	})
+	if !found {
+		err = ErrUnknownProject
+	}
 
 	return err
 }

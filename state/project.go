@@ -7,8 +7,19 @@ import (
 	"github.com/krelinga/video-in-be/env"
 )
 
+type ThumbState string
+
+const (
+	ThumbStateNone    ThumbState = ""
+	ThumbStateWaiting ThumbState = "waiting"
+	ThumbStateWorking ThumbState = "working"
+	ThumbStateDone    ThumbState = "done"
+	ThumbStateError   ThumbState = "error"
+)
+
 type Project struct {
-	Name string `json:"name"`
+	Name   string                `json:"name"`
+	Thumbs map[string]ThumbState `json:"thumbs,omitempty"`
 }
 
 var projectMutex = &sync.RWMutex{}
