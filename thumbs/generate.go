@@ -1,6 +1,7 @@
 package thumbs
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log"
@@ -54,7 +55,7 @@ func generateDiscThumbs(d *disc) error {
 		if err != nil {
 			return err
 		}
-		if err := ffmpeg(d, dur); err != nil {
+		if err := ffmpeg(d, vf.Name(), dur); err != nil {
 			return err
 		}
 	}
@@ -86,12 +87,15 @@ func thumbsDir(d *disc) string {
 	return filepath.Join(env.ThumbsDir(), d.Project, d.Disc)
 }
 
-func ffmpeg(d *disc, offset time.Duration) error {
-	thumbPath := filepath.Join(state.ProjectDir(d.Project), d.Disc, "thumb.jpg")
+func ffmpeg(d *disc, vf string, offset time.Duration) error {
+	thumbPath := filepath.Join(env.ThumbsDir(), d.Project, d.Disc, fmt.Sprintf("%s.jpg", vf))
+	videoPath := filepath.Join(discPath(d), vf)
 	offsetStr := fmt.Sprintf("%02d:%02d:%02d", int(offset.Hours()), int(offset.Minutes())%60, int(offset.Seconds())%60)
-	cmd := exec.Command("ffmpeg", "-i", thumbPath, "-ss", offsetStr, "-frames:v", "1", "-q:v", "2", "-y", thumbPath)
+	cmd := exec.Command("ffmpeg", "-i", videoPath, "-ss", offsetStr, "-frames:v", "1", "-q:v", "2", "-y", thumbPath)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%w: %w", ErrFFMpeg, err)
+		return fmt.Errorf("%w: %w: %s", ErrFFMpeg, err, stderr.String())
 	}
 	return nil
 }
