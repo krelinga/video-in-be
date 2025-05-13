@@ -16,10 +16,15 @@ func (*ConnectService) UnclaimedDiscDirList(ctx context.Context, req *connect.Re
 	return connect.NewResponse(resp), nil
 }
 
-func (*ConnectService) ProjectAssignDiskDirs(ctx context.Context, req *connect.Request[pb.ProjectAssignDiskDirsRequest]) (*connect.Response[pb.ProjectAssignDiskDirsResponse], error) {
+func (cs *ConnectService) ProjectAssignDiskDirs(ctx context.Context, req *connect.Request[pb.ProjectAssignDiskDirsRequest]) (*connect.Response[pb.ProjectAssignDiskDirsResponse], error) {
 	err := state.ProjectAssignDiskDirs(req.Msg.Project, req.Msg.Dirs)
 	if err != nil {
 		return nil, err
+	}
+	for _, d := range req.Msg.Dirs {
+		if err := cs.thumbQueue.AddDisc(req.Msg.Project, d); err != nil {
+			return nil, connect.NewError(connect.CodeInternal, err)
+		}
 	}
 	return connect.NewResponse(&pb.ProjectAssignDiskDirsResponse{}), nil
 }
