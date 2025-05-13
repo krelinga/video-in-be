@@ -34,3 +34,36 @@ func ProjectsModify(fn func([]*Project) []*Project) {
 func ProjectDir(project string) string {
 	return filepath.Join(env.ProjectDir(), project)
 }
+
+func ProjectRead(name string, fn func(*Project)) bool {
+	var found bool
+	ProjectsRead(func(all []*Project) {
+		for _, x := range all {
+			if x.Name == name {
+				found = true
+				if fn != nil {
+					fn(x)
+				}
+				return
+			}
+		}
+	})
+	return found
+}
+
+func ProjectModify(name string, fn func(*Project)) bool {
+	var found bool
+	ProjectsModify(func(all []*Project) []*Project {
+		for _, x := range all {
+			if x.Name == name {
+				found = true
+				if fn != nil {
+					fn(x)
+				}
+				break
+			}
+		}
+		return all
+	})
+	return found
+}
