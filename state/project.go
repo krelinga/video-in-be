@@ -17,9 +17,19 @@ const (
 	ThumbStateError   ThumbState = "error"
 )
 
+type FileCat string
+
+const (
+	FileCatNone      FileCat = ""
+	FileCatMainTitle FileCat = "main_title"
+	FileCatExtra     FileCat = "extra"
+	FileCatTrash     FileCat = "trash"
+)
+
 type Project struct {
 	Name   string                `json:"name"`
 	Thumbs map[string]ThumbState `json:"thumbs,omitempty"`
+	Files  map[string]FileCat    `json:"files,omitempty"`
 }
 
 var projectMutex = &sync.RWMutex{}
