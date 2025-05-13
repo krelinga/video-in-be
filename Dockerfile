@@ -33,7 +33,8 @@ EXPOSE 25004
 # Set these environment variables before running the container.
 ENV VIDEOIN_PROJECTDIR= \
     VIDEOIN_STATEDIR= \
-    VIDEOIN_UNCLAIMEDDIR=
+    VIDEOIN_UNCLAIMEDDIR= \
+    VIDEOIN_THUMBSDIR=
 
 # Command to run the binary
 CMD ["./main"]
