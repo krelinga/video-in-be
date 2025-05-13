@@ -30,11 +30,11 @@ COPY --from=builder /app/main .
 # Expose the application port
 EXPOSE 25004
 
-# Set these environment variables before running the container.
-ENV VIDEOIN_PROJECTDIR= \
-    VIDEOIN_STATEDIR= \
-    VIDEOIN_UNCLAIMEDDIR= \
-    VIDEOIN_THUMBSDIR=
+# Users must set these environment variables before running the container:
+# VIDEOIN_PROJECTDIR: Directory where the project files are located.
+# VIDEOIN_STATEDIR: Directory where the state files are stored.
+# VIDEOIN_UNCLAIMEDDIR: Directory for unclaimed files.
+# VIDEOIN_THUMBSDIR: Directory for thumbnail files.
 
 # Command to run the binary
 CMD ["./main"]
