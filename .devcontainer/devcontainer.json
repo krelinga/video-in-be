@@ -7,7 +7,6 @@
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	},
-	"runArgs": ["--network=dev-network"],
 	"mounts": [
 		"source=/nas/media,target=/nas/media,type=bind"
 	],
