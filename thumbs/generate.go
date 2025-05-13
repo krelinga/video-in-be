@@ -26,10 +26,10 @@ func generateThumbs(in <-chan *disc) {
 }
 
 var (
-	ErrNoDuration = errors.New("no duration found")
-	ErrCouldNotReadDiscDir = errors.New("could not read disc directory")
+	ErrNoDuration              = errors.New("no duration found")
+	ErrCouldNotReadDiscDir     = errors.New("could not read disc directory")
 	ErrCouldNotCreateThumbsDir = errors.New("could not create thumbs directory")
-	ErrFFMpeg = errors.New("ffmpeg error")
+	ErrFFMpeg                  = errors.New("ffmpeg error")
 )
 
 func generateDiscThumbs(d *disc) error {
@@ -50,7 +50,7 @@ func generateDiscThumbs(d *disc) error {
 		if vf.IsDir() || !strings.HasSuffix(vf.Name(), ".mkv") {
 			continue
 		}
-		dur, err := getThumbOffset(d)
+		dur, err := getThumbOffset(d, vf.Name())
 		if err != nil {
 			return err
 		}
@@ -70,8 +70,8 @@ func discPath(d *disc) string {
 	return filepath.Join(state.ProjectDir(d.Project), d.Disc)
 }
 
-func getThumbOffset(d *disc) (time.Duration, error) {
-	info, err := ffprobe.New(discPath(d))
+func getThumbOffset(d *disc, vf string) (time.Duration, error) {
+	info, err := ffprobe.New(filepath.Join(discPath(d), vf))
 	if err != nil {
 		return 0, err
 	}
