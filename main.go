@@ -42,27 +42,8 @@ func main() {
 	// Serve static files with CORS enabled
 	staticDir := env.ThumbsDir()
 	staticHandler := http.StripPrefix("/thumbs/", http.FileServer(http.Dir(staticDir)))
-	mux.Handle("/thumbs/", enableCORS(staticHandler))
+	mux.Handle("/thumbs/", staticHandler)
 
 	// Start the HTTP server
 	http.ListenAndServe("0.0.0.0:25004", h2c.NewHandler(mux, &http2.Server{}))
-}
-
-// enableCORS is middleware that adds CORS headers to the response
-func enableCORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-		// Handle preflight requests
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-
-		// Call the next handler
-		next.ServeHTTP(w, r)
-	})
 }
