@@ -2,6 +2,7 @@ package tmdb
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/krelinga/video-in-be/env"
 	api "github.com/ryanbradynd05/go-tmdb"
@@ -10,6 +11,7 @@ import (
 var (
 	client *api.TMDb
 	movieGenreMap map[int]string
+	configuration *api.Configuration
 )
 
 func getGenre(id int) (string, bool) {
@@ -17,6 +19,11 @@ func getGenre(id int) (string, bool) {
 		return name, true
 	}
 	return "", false
+}
+
+func getPosterUrl(leaf string) string {
+	size := configuration.Images.PosterSizes[len(configuration.Images.PosterSizes)-1]
+	return filepath.Join(configuration.Images.SecureBaseURL, size, leaf)
 }
 
 func init() {
@@ -33,5 +40,11 @@ func init() {
 	movieGenreMap = make(map[int]string)
 	for _, mapping := range genres.Genres {
 		movieGenreMap[int(mapping.ID)] = mapping.Name
+	}
+
+	// Prefetch configuration
+	configuration, err = client.GetConfiguration()
+	if err != nil {
+		panic(fmt.Sprintf("failed to fetch TMDb configuration: %v", err))
 	}
 }

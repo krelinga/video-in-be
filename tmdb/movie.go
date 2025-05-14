@@ -46,7 +46,7 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 		out = append(out, &MovieSearchResult{
 			ID:            int(r.ID),
 			OriginalTitle: r.OriginalTitle,
-			PosterUrl:     r.PosterPath,
+			PosterUrl:     getPosterUrl(r.PosterPath),
 			Title:         r.Title,
 			RealaseDate:   releaseDate,
 			Overview:      r.Overview,
