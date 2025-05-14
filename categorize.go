@@ -17,7 +17,6 @@ func (*ConnectService) ProjectCategorizeFiles(ctx context.Context, req *connect.
 			return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("file name is empty"))
 		}
 
-		
 	}
 
 	var err error
@@ -34,10 +33,11 @@ func (*ConnectService) ProjectCategorizeFiles(ctx context.Context, req *connect.
 				return
 			}
 
+			isNone := fileProto.Category == string(state.FileCatNone)
 			isMainTitle := fileProto.Category == string(state.FileCatMainTitle)
 			isExtra := fileProto.Category == string(state.FileCatExtra)
 			isTrash := fileProto.Category == string(state.FileCatTrash)
-			if !isMainTitle && !isExtra && !isTrash {
+			if !isMainTitle && !isExtra && !isTrash && !isNone {
 				err = connect.NewError(connect.CodeInvalidArgument, errors.New("invalid file category"))
 				return
 			}
