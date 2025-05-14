@@ -35,6 +35,7 @@ EXPOSE 25004
 # VIDEOIN_STATEDIR: Directory where the state files are stored.
 # VIDEOIN_UNCLAIMEDDIR: Directory for unclaimed files.
 # VIDEOIN_THUMBSDIR: Directory for thumbnail files.
+# VIDEOIN_TMDBKEY: TMDB API key for metadata fetching.
 
 # Command to run the binary
 CMD ["./main"]
