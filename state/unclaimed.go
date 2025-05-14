@@ -68,6 +68,10 @@ func ProjectAssignDiskDirs(projectName string, dirs []string) error {
 				err = ErrUnclaimedDirMoveFailed
 				return
 			}
+			disc := &Disc{
+				Name: dir,
+			}
+			project.Discs = append(project.Discs, disc)
 		}
 	})
 	if !found {
