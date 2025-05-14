@@ -27,8 +27,9 @@ const (
 )
 
 type Project struct {
-	Name  string  `json:"name"`
-	Discs []*Disc `json:"discs,omitempty"`
+	Name   string  `json:"name"`
+	Discs  []*Disc `json:"discs,omitempty"`
+	TmdbId int     `json:"tmdb_id,omitempty"`
 }
 
 func (p *Project) FindDiscByName(name string) *Disc {
@@ -41,9 +42,9 @@ func (p *Project) FindDiscByName(name string) *Disc {
 }
 
 type Disc struct {
-	Name  string  `json:"name"`
+	Name       string     `json:"name"`
 	ThumbState ThumbState `json:"thumb_state,omitempty"`
-	Files []*File `json:"files,omitempty"`
+	Files      []*File    `json:"files,omitempty"`
 }
 
 func (d *Disc) FindFileByName(name string) *File {

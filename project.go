@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"strconv"
 
 	pb "buf.build/gen/go/krelinga/proto/protocolbuffers/go/krelinga/video/in/v1"
 	"connectrpc.com/connect"
@@ -91,4 +92,19 @@ func (*ConnectService) ProjectGet(ctx context.Context, req *connect.Request[pb.P
 
 	// Return the response
 	return connect.NewResponse(response), nil
+}
+
+func (*ConnectService) ProjectSetMetadata(ctx context.Context, req *connect.Request[pb.ProjectSetMetadataRequest]) (*connect.Response[pb.ProjectSetMetadataResponse], error) {
+	resp := &pb.ProjectSetMetadataResponse{}
+	id, err := strconv.Atoi(req.Msg.GetId())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid project ID"))
+	}
+	found := state.ProjectModify(req.Msg.Project, func(project *state.Project) {
+		project.TmdbId = id
+	})
+	if !found {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
+	}
+	return connect.NewResponse(resp), nil
 }
