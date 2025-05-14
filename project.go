@@ -83,7 +83,7 @@ func (*ConnectService) ProjectGet(ctx context.Context, req *connect.Request[pb.P
 		}
 	})
 	if !found {
-		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
+		err = connect.NewError(connect.CodeNotFound, errors.New("project not found"))
 	}
 	if err != nil {
 		return nil, err
