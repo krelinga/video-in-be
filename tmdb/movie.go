@@ -7,13 +7,13 @@ import (
 )
 
 type MovieSearchResult struct {
-	ID int
+	ID            int
 	OriginalTitle string
-	PosterUrl string
-	Title string
-	RealaseDate time.Time
-	Overview string
-	Genres []string
+	PosterUrl     string
+	Title         string
+	RealaseDate   time.Time
+	Overview      string
+	Genres        []string
 }
 
 func SearchMovies(query string) ([]*MovieSearchResult, error) {
@@ -35,19 +35,22 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 			}
 		}
 
-		releaseDate, err := time.Parse(time.DateOnly, r.ReleaseDate)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse release date %s: %v", r.ReleaseDate, err)
+		var releaseDate time.Time
+		if r.ReleaseDate != "" {
+			releaseDate, err = time.Parse(time.DateOnly, r.ReleaseDate)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse release date %q: %v", r.ReleaseDate, err)
+			}
 		}
 
 		out = append(out, &MovieSearchResult{
-			ID: int(r.ID),
+			ID:            int(r.ID),
 			OriginalTitle: r.OriginalTitle,
-			PosterUrl: r.PosterPath,
-			Title: r.Title,
-			RealaseDate: releaseDate,
-			Overview: r.Overview,
-			Genres: genreNames,
+			PosterUrl:     r.PosterPath,
+			Title:         r.Title,
+			RealaseDate:   releaseDate,
+			Overview:      r.Overview,
+			Genres:        genreNames,
 		})
 	}
 
