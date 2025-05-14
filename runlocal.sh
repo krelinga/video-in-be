@@ -18,4 +18,4 @@ export VIDEOIN_PROJECTDIR=$rootdir/project
 export VIDEOIN_THUMBSDIR=$rootdir/thumbs
 
 docker build -t video-in-be .
-docker run --rm -v /nas/media:/nas/media -v ${rootdir}:${rootdir} --env VIDEOIN_UNCLAIMEDDIR --env VIDEOIN_STATEDIR --env VIDEOIN_PROJECTDIR --env VIDEOIN_THUMBSDIR -it -p 25004:25004 --name video-in-be video-in-be
+docker run --rm -v ${rootdir}:${rootdir} --env VIDEOIN_UNCLAIMEDDIR --env VIDEOIN_STATEDIR --env VIDEOIN_PROJECTDIR --env VIDEOIN_THUMBSDIR -it -p 25004:25004 --name video-in-be video-in-be
