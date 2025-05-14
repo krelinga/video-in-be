@@ -3,8 +3,8 @@ module github.com/krelinga/video-in-be
 go 1.23.4
 
 require (
-	buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250514190152-976e7b438957.1
-	buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250514190152-976e7b438957.1
+	buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250514202313-5e4e87d761c6.1
+	buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250514202313-5e4e87d761c6.1
 	connectrpc.com/connect v1.18.1
 	github.com/ryanbradynd05/go-tmdb v0.0.0-20230108222638-2a68dc6ff40c
 	golang.org/x/net v0.23.0
