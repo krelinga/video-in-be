@@ -8,6 +8,7 @@ import (
 	pb "buf.build/gen/go/krelinga/proto/protocolbuffers/go/krelinga/video/in/v1"
 	"connectrpc.com/connect"
 	"github.com/krelinga/video-in-be/state"
+	"github.com/krelinga/video-in-be/tmdb"
 )
 
 var (
@@ -64,6 +65,14 @@ func (*ConnectService) ProjectGet(ctx context.Context, req *connect.Request[pb.P
 	var err error
 	found := state.ProjectRead(req.Msg.Project, func(project *state.Project) {
 		response.Project = project.Name
+		if project.TmdbId != 0 {
+			movieDetails, err := tmdb.GetMovieDetails(project.TmdbId)
+			if err != nil {
+				err = connect.NewError(connect.CodeInternal, errors.New("failed to get movie details"))
+				return
+			}
+			response.SearchResult = convertMovieSearchResult(&movieDetails.MovieSearchResult)
+		}
 		for _, disc := range project.Discs {
 			dProto := &pb.ProjectDisc{
 				Disc:       disc.Name,

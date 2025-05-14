@@ -16,6 +16,30 @@ type MovieSearchResult struct {
 	Genres        []string
 }
 
+func convertGenreIDs(in []int32) []string {
+	// Convert genre IDs to a slice of int
+	out := make([]string, 0, len(in))
+	for _, id := range in {
+		if name, ok := getGenre(int(id)); ok {
+			out = append(out, name)
+		} else {
+			log.Printf("Unknown genre ID %d, skipping", id)
+		}
+	}
+	return out
+}
+
+func convertReleaseDate(in string) (time.Time, error) {
+	if in == "" {
+		return time.Time{}, nil
+	}
+	releaseDate, err := time.Parse(time.DateOnly, in)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("failed to parse release date %q: %v", in, err)
+	}
+	return releaseDate, nil
+}
+
 func SearchMovies(query string) ([]*MovieSearchResult, error) {
 	// Search for movies
 	result, err := client.SearchMovie(query, nil)
@@ -25,24 +49,10 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 
 	out := make([]*MovieSearchResult, 0, len(result.Results))
 	for _, r := range result.Results {
-		// Get the genre names
-		genreNames := make([]string, 0, len(r.GenreIDs))
-		for _, id := range r.GenreIDs {
-			if name, ok := getGenre(int(id)); ok {
-				genreNames = append(genreNames, name)
-			} else {
-				log.Printf("Unknown genre ID %d, skipping", id)
-			}
+		releaseDate, err := convertReleaseDate(r.ReleaseDate)
+		if err != nil {
+			return nil, err
 		}
-
-		var releaseDate time.Time
-		if r.ReleaseDate != "" {
-			releaseDate, err = time.Parse(time.DateOnly, r.ReleaseDate)
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse release date %q: %v", r.ReleaseDate, err)
-			}
-		}
-
 		out = append(out, &MovieSearchResult{
 			ID:            int(r.ID),
 			OriginalTitle: r.OriginalTitle,
@@ -50,9 +60,47 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 			Title:         r.Title,
 			RealaseDate:   releaseDate,
 			Overview:      r.Overview,
-			Genres:        genreNames,
+			Genres:        convertGenreIDs(r.GenreIDs),
 		})
 	}
 
+	return out, nil
+}
+
+type MovieDetails struct {
+	MovieSearchResult
+
+	// TODO: Add more fields
+}
+
+func GetMovieDetails(id int) (*MovieDetails, error) {
+	result, err := client.GetMovieInfo(id, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	releaseDate, err := convertReleaseDate(result.ReleaseDate)
+	if err != nil {
+		return nil, err
+	}
+	genres := make([]string, 0, len(result.Genres))
+	for _, g := range result.Genres {
+		if g.Name == "" {
+			log.Printf("Unknown genre ID %d, skipping", g.ID)
+			continue
+		}
+		genres = append(genres, g.Name)
+	}
+	out := &MovieDetails{
+		MovieSearchResult: MovieSearchResult{
+			ID:            int(result.ID),
+			OriginalTitle: result.OriginalTitle,
+			PosterUrl:     getPosterUrl(result.PosterPath),
+			Title:         result.Title,
+			RealaseDate:   releaseDate,
+			Overview:      result.Overview,
+			Genres:        genres,
+		},
+	}
 	return out, nil
 }
