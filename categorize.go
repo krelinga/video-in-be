@@ -3,42 +3,49 @@ package main
 import (
 	"context"
 	"errors"
-	"path/filepath"
 
 	pb "buf.build/gen/go/krelinga/proto/protocolbuffers/go/krelinga/video/in/v1"
 	"connectrpc.com/connect"
 	"github.com/krelinga/video-in-be/state"
 )
 
-func (*ConnectService) DiscCategorizeFiles(ctx context.Context, req *connect.Request[pb.DiscCategorizeFilesRequest]) (*connect.Response[pb.DiscCategorizeFilesResponse], error) {
-	resp := &pb.DiscCategorizeFilesResponse{}
+func (*ConnectService) ProjectCategorizeFiles(ctx context.Context, req *connect.Request[pb.ProjectCategorizeFilesRequest]) (*connect.Response[pb.ProjectCategorizeFilesResponse], error) {
+	resp := &pb.ProjectCategorizeFilesResponse{}
 
 	for _, file := range req.Msg.Files {
 		if file.File == "" {
 			return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("file name is empty"))
 		}
 
-		isMainTitle := file.Category == string(state.FileCatMainTitle)
-		isExtra := file.Category == string(state.FileCatExtra)
-		isTrash := file.Category == string(state.FileCatTrash)
-		if !isMainTitle && !isExtra && !isTrash {
-			return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid file category"))
-		}
+		
 	}
 
 	var err error
 	found := state.ProjectModify(req.Msg.Project, func(p *state.Project) {
-		if _, ok := p.Thumbs[req.Msg.Disc]; !ok {
-			err = connect.NewError(connect.CodeNotFound, errors.New("unknown disc"))
-			return
-		}
-		for _, file := range req.Msg.Files {
-			fileKey := filepath.Join(req.Msg.Disc, file.File)
-			p.Files[fileKey] = state.FileCat(file.Category)
+		for _, fileProto := range req.Msg.Files {
+			disc := p.FindDiscByName(fileProto.Disc)
+			if disc == nil {
+				err = connect.NewError(connect.CodeNotFound, errors.New("disc not found"))
+				return
+			}
+			file := disc.FindFileByName(fileProto.File)
+			if file == nil {
+				err = connect.NewError(connect.CodeNotFound, errors.New("file not found"))
+				return
+			}
+
+			isMainTitle := fileProto.Category == string(state.FileCatMainTitle)
+			isExtra := fileProto.Category == string(state.FileCatExtra)
+			isTrash := fileProto.Category == string(state.FileCatTrash)
+			if !isMainTitle && !isExtra && !isTrash {
+				err = connect.NewError(connect.CodeInvalidArgument, errors.New("invalid file category"))
+				return
+			}
+			file.Category = state.FileCat(fileProto.Category)
 		}
 	})
 	if !found {
-		return nil, connect.NewError(connect.CodeNotFound, state.ErrUnknownProject)
+		err = connect.NewError(connect.CodeNotFound, state.ErrUnknownProject)
 	}
 	if err != nil {
 		return nil, err

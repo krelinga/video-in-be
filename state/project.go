@@ -27,9 +27,47 @@ const (
 )
 
 type Project struct {
-	Name   string                `json:"name"`
-	Thumbs map[string]ThumbState `json:"thumbs,omitempty"`
-	Files  map[string]FileCat    `json:"files,omitempty"`
+	Name  string  `json:"name"`
+	Discs []*Disc `json:"discs,omitempty"`
+}
+
+func (p *Project) FindDiscByName(name string) *Disc {
+	for _, d := range p.Discs {
+		if d.Name == name {
+			return d
+		}
+	}
+	return nil
+}
+
+type Disc struct {
+	Name  string  `json:"name"`
+	ThumbState ThumbState `json:"thumb_state,omitempty"`
+	Files []*File `json:"files,omitempty"`
+}
+
+func (d *Disc) FindFileByName(name string) *File {
+	for _, f := range d.Files {
+		if f.Name == name {
+			return f
+		}
+	}
+	return nil
+}
+
+func (d *Disc) FindFileByThumbnail(thumbnail string) *File {
+	for _, f := range d.Files {
+		if f.Thumbnail == thumbnail {
+			return f
+		}
+	}
+	return nil
+}
+
+type File struct {
+	Name      string  `json:"name"`
+	Category  FileCat `json:"category,omitempty"`
+	Thumbnail string  `json:"thumbnail,omitempty"`
 }
 
 var projectMutex = &sync.RWMutex{}

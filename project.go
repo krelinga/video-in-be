@@ -7,7 +7,6 @@ import (
 	pb "buf.build/gen/go/krelinga/proto/protocolbuffers/go/krelinga/video/in/v1"
 	"connectrpc.com/connect"
 	"github.com/krelinga/video-in-be/state"
-	"github.com/krelinga/video-in-be/thumbs"
 )
 
 var (
@@ -64,19 +63,22 @@ func (*ConnectService) ProjectGet(ctx context.Context, req *connect.Request[pb.P
 	var err error
 	found := state.ProjectRead(req.Msg.Project, func(project *state.Project) {
 		response.Project = project.Name
-		for disc, thumbState := range project.Thumbs {
-			d := &pb.ProjectDisc{
-				Project:    project.Name,
-				Disc:       disc,
-				ThumbState: string(thumbState),
+		for _, disc := range project.Discs {
+			dProto := &pb.ProjectDisc{
+				Disc:       disc.Name,
+				ThumbState: string(disc.ThumbState),
 			}
-			response.Discs = append(response.Discs, d)
-			if thumbState == state.ThumbStateDone {
-				d.Thumbs, err = thumbs.List(project.Name, disc)
-				if err != nil {
-					err = connect.NewError(connect.CodeInternal, err)
-					return
+			response.Discs = append(response.Discs, dProto)
+			if disc.ThumbState != state.ThumbStateDone {
+				continue
+			}
+			for _, file := range disc.Files {
+				fProto := &pb.DiscFile{
+					File:     file.Name,
+					Category: string(file.Category),
+					Thumb:    file.Thumbnail,
 				}
+				dProto.DiscFiles = append(dProto.DiscFiles, fProto)
 			}
 		}
 	})

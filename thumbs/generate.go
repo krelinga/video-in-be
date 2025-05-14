@@ -97,5 +97,25 @@ func ffmpeg(d *disc, vf string, offset time.Duration) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("%w: %w: %s", ErrFFMpeg, err, stderr.String())
 	}
-	return nil
+
+	var err error
+	found := state.ProjectModify(d.Project, func(p *state.Project) {
+		disc := p.FindDiscByName(d.Disc)
+		if disc == nil {
+			err = errors.New("unknown disc")
+			return
+		}
+		if disc.FindFileByName(vf) != nil {
+			panic("file state already exists")
+		}
+		disc.Files = append(disc.Files, &state.File{
+			Name:      vf,
+			Thumbnail: thumbPath,
+		})
+	})
+	if !found {
+		err = fmt.Errorf("%w %s", state.ErrUnknownProject, d.Project)
+	}
+
+	return err
 }

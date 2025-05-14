@@ -45,15 +45,16 @@ func NewQueue(length int) *Queue {
 func setState(project, discName string, oldState, newState state.ThumbState) error {
 	var err error
 	found := state.ProjectModify(project, func(p *state.Project) {
-		if _, ok := p.Thumbs[discName]; !ok {
+		disc := p.FindDiscByName(discName)
+		if disc == nil {
 			err = fmt.Errorf("%w %s for project named %s", ErrUnknownDisc, discName, project)
 			return
 		}
-		if p.Thumbs[discName] != oldState {
-			err = fmt.Errorf("%w for project %s disc %s state %s expected state %s", ErrDiscState, project, discName, p.Thumbs[discName], oldState)
+		if disc.ThumbState != oldState {
+			err = fmt.Errorf("%w for project %s disc %s state %s expected state %s", ErrDiscState, project, discName, disc.ThumbState, oldState)
 			return
 		}
-		p.Thumbs[discName] = newState
+		disc.ThumbState = newState
 	})
 	if !found {
 		err = fmt.Errorf("%w %s", ErrUnknownProject, project)
@@ -63,9 +64,9 @@ func setState(project, discName string, oldState, newState state.ThumbState) err
 
 func trySetError(project, discName string) {
 	state.ProjectModify(project, func(p *state.Project) {
-		if _, ok := p.Thumbs[discName]; !ok {
-			return
+		disc := p.FindDiscByName(discName)
+		if disc != nil {
+			disc.ThumbState = state.ThumbStateError
 		}
-		p.Thumbs[discName] = state.ThumbStateError
 	})
 }
