@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	client *api.TMDb
+	client        *api.TMDb
 	movieGenreMap map[int]string
 	configuration *api.Configuration
 )
@@ -22,7 +22,8 @@ func getGenre(id int) (string, bool) {
 }
 
 func getPosterUrl(leaf string) string {
-	size := configuration.Images.PosterSizes[len(configuration.Images.PosterSizes)-1]
+	// TODO: validate that the poster sizes are large enough.
+	size := configuration.Images.PosterSizes[len(configuration.Images.PosterSizes)-4]
 	return filepath.Join(configuration.Images.SecureBaseURL, size, leaf)
 }
 
