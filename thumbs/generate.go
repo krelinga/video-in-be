@@ -110,7 +110,7 @@ func ffmpeg(d *disc, vf string, offset time.Duration) error {
 		}
 		disc.Files = append(disc.Files, &state.File{
 			Name:      vf,
-			Thumbnail: thumbPath,
+			Thumbnail: fmt.Sprintf("%s.jpg", vf),
 		})
 	})
 	if !found {
