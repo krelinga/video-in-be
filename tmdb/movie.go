@@ -69,8 +69,8 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 
 type MovieDetails struct {
 	MovieSearchResult
-
-	// TODO: Add more fields
+	Tagline string
+	Runtime time.Duration
 }
 
 func GetMovieDetails(id int) (*MovieDetails, error) {
@@ -101,6 +101,8 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 			Overview:      result.Overview,
 			Genres:        genres,
 		},
+		Tagline: result.Tagline,
+		Runtime: time.Duration(result.Runtime) * time.Minute,
 	}
 	return out, nil
 }

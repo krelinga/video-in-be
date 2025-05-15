@@ -12,6 +12,7 @@ import (
 func runDemo() error {
 	demos := map[string]func() error{
 		"search_movies": searchMovies,
+		"movie_nfo":     movieNfo,
 	}
 	listDemos := func() string {
 		return "available demos: " + strings.Join(slices.Collect(maps.Keys(demos)), ", ")
