@@ -10,9 +10,12 @@ func (m *Movie) Write(writer io.Writer) error {
 	if err != nil {
 		return err
 	}
-	_, err = writer.Write(x)
-	if err != nil {
-		return err
+	toWrite := [][]byte{x, []byte("\n")}
+	for _, b := range toWrite {
+		_, err = writer.Write(b)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

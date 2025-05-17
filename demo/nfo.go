@@ -29,7 +29,6 @@ func movieNfo() error {
 	if err != nil {
 		return err
 	}
-	os.Stdout.Write([]byte("\n"))
 
 	return nil
 }
