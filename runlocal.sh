@@ -19,7 +19,9 @@ export VIDEOIN_THUMBSDIR=$rootdir/thumbs
 source tmdb_key.sh
 
 docker build -t video-in-be .
-docker run --rm -v ${rootdir}:${rootdir} \
+docker run --rm \
+    -v ${rootdir}:${rootdir} \
+    -v /nas/media:/nas/media \
     --env VIDEOIN_TMDBKEY \
     --env VIDEOIN_UNCLAIMEDDIR \
     --env VIDEOIN_STATEDIR \
