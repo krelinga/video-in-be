@@ -16,6 +16,7 @@ cp testdata/testdata_sample_640x360.mkv $VIDEOIN_UNCLAIMEDDIR/disc4
 export VIDEOIN_STATEDIR=$rootdir/state
 export VIDEOIN_PROJECTDIR=$rootdir/project
 export VIDEOIN_THUMBSDIR=$rootdir/thumbs
+export VIDEOIN_LIBRARYDIR=$rootdir/library
 source tmdb_key.sh
 
 docker build -t video-in-be .
@@ -27,4 +28,5 @@ docker run --rm \
     --env VIDEOIN_STATEDIR \
     --env VIDEOIN_PROJECTDIR \
     --env VIDEOIN_THUMBSDIR \
+    --env VIDEOIN_LIBRARYDIR \
     -it -p 25004:25004 --name video-in-be video-in-be "${@}"
