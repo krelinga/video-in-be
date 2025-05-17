@@ -1,7 +1,6 @@
 package demo
 
 import (
-	"encoding/xml"
 	"flag"
 	"os"
 
@@ -26,11 +25,10 @@ func movieNfo() error {
 	if err != nil {
 		return err
 	}
-	xml, err := xml.MarshalIndent(movie, "", "  ")
+	err = movie.Write(os.Stdout)
 	if err != nil {
 		return err
 	}
-	os.Stdout.Write(xml)
 	os.Stdout.Write([]byte("\n"))
 
 	return nil
