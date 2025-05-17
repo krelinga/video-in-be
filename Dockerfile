@@ -38,4 +38,4 @@ EXPOSE 25004
 # VIDEOIN_TMDBKEY: TMDB API key for metadata fetching.
 
 # Command to run the binary
-CMD ["./main"]
+ENTRYPOINT ["./main"]

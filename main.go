@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/krelinga/video-in-be/demo"
 	"github.com/krelinga/video-in-be/server"
 )
 
@@ -22,7 +23,7 @@ func main() {
 	case "server":
 		server.Start()
 	case "demo":
-		// TODO: run demo
+		demo.Run()
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown mode: %s, supported modes are 'server' and 'demo'\n", mode)
 		os.Exit(1)
