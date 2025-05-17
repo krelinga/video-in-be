@@ -127,3 +127,24 @@ func ProjectModify(name string, fn func(*Project)) bool {
 	})
 	return found
 }
+
+func ProjectReadAndRemove(name string, fn func(*Project) error) bool {
+	var found bool
+	ProjectsModify(func(in []*Project) []*Project {
+		out := make([]*Project, 0, len(in))
+		for _, x := range in {
+			if x.Name == name {
+				found = true
+				err := fn(x)
+				if err != nil {
+					// Only remove this project if the function returns nil
+					return in
+				}
+ 			} else {
+				out = append(out, x)
+			}
+		}
+		return out
+	})
+	return found
+}
