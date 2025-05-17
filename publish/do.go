@@ -127,5 +127,10 @@ func Do(project *state.Project) error {
 		}
 	}
 
+	// Finally, remove the project directory if nothing failed.
+	if err := os.RemoveAll(state.ProjectDir(project.Name)); err != nil {
+		return fmt.Errorf("could not remove project directory %s: %w", state.ProjectDir(project.Name), err)
+	}
+
 	return nil
 }
