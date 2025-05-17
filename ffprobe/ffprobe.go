@@ -10,14 +10,14 @@ type FFProbe struct {
 	Raw *Raw
 }
 
-func (f *FFProbe) GetWidth() (int64, bool) {
+func (f *FFProbe) GetWidth() (int, bool) {
 	if f.Raw == nil || f.Raw.Streams == nil || len(f.Raw.Streams) == 0 {
 		return 0, false
 	}
 	return f.Raw.Streams[0].Width, true
 }
 
-func (f *FFProbe) GetHeight() (int64, bool) {
+func (f *FFProbe) GetHeight() (int, bool) {
 	if f.Raw == nil || f.Raw.Streams == nil || len(f.Raw.Streams) == 0 {
 		return 0, false
 	}

@@ -22,7 +22,10 @@ func movieNfo() error {
 	if err != nil {
 		return err
 	}
-	movie := nfo.NewMovie(movieDetails, fileInfo)
+	movie, err := nfo.NewMovie(movieDetails, fileInfo)
+	if err != nil {
+		return err
+	}
 	xml, err := xml.MarshalIndent(movie, "", "  ")
 	if err != nil {
 		return err
