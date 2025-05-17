@@ -9,6 +9,20 @@ import (
 	"github.com/krelinga/video-in-be/tmdb"
 )
 
+var codecMapping = func() map[string]string {
+	return map[string]string{
+		"mpeg2video": "MPEG-2",
+		"ac3":        "AC3",
+	}
+}()
+
+func translateCodec(codec string) (string, error) {
+	if translated, ok := codecMapping[codec]; ok {
+		return translated, nil
+	}
+	return "", fmt.Errorf("unknown codec: %q", codec)
+}
+
 func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outMovie *Movie, outError error) {
 	setError := func(err error) {
 		if outError == nil {
@@ -44,7 +58,14 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 							return
 						}
 						if !yield(&Video{
-							Codec:  stream.CodecLongName, // TODO: some translation needed
+							Codec: func() string {
+								c, err := translateCodec(stream.CodecName)
+								if err != nil {
+									setError(err)
+									return ""
+								}
+								return c
+							}(),
 							Aspect: aspect,
 							Width:  stream.Width,
 							Height: stream.Height,
@@ -63,7 +84,14 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 				Audios: slices.Collect(func(yield func(*Audio) bool) {
 					for stream := range probeInfo.GetAudioStreams() {
 						if !yield(&Audio{
-							Codec:    stream.CodecName, // TODO: some translation needed
+							Codec: func() string {
+								c, err := translateCodec(stream.CodecName)
+								if err != nil {
+									setError(err)
+									return ""
+								}
+								return c
+							}(),
 							Channels: stream.Channels,
 							Language: stream.Tags.Language,
 						}) {
