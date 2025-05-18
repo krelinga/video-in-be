@@ -98,11 +98,11 @@ func Do(project *state.Project) error {
 	// Generate NFO
 	probeInfo, err := ffprobe.New(mainPath)
 	if err != nil {
-		return nil
+		return err
 	}
 	movieNfo, err := nfo.NewMovie(tmdbMovie, probeInfo)
 	if err != nil {
-		return nil
+		return err
 	}
 	err = func() error {
 		f, err := os.Create(p.Main(".nfo"))
@@ -116,7 +116,7 @@ func Do(project *state.Project) error {
 		return nil
 	}()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	// TODO: generate .tcprofile file.
