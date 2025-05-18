@@ -3,6 +3,7 @@ package nfo
 import (
 	"errors"
 	"fmt"
+	"log"
 	"slices"
 
 	"github.com/krelinga/video-in-be/ffprobe"
@@ -54,8 +55,8 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 					for stream := range probeInfo.GetVideoStreams() {
 						aspect, err := stream.DisplayAspectRatio.Parse()
 						if err != nil {
-							setError(err)
-							return
+							log.Printf("could not parse aspect ratio %q: %v", stream.DisplayAspectRatio, err)
+							aspect = ""
 						}
 						if !yield(&Video{
 							Codec: func() string {
