@@ -9,6 +9,7 @@ import (
 
 	pb "buf.build/gen/go/krelinga/proto/protocolbuffers/go/krelinga/video/in/v1"
 	"connectrpc.com/connect"
+	"github.com/krelinga/video-in-be/publish"
 	"github.com/krelinga/video-in-be/state"
 	"github.com/krelinga/video-in-be/thumbs"
 	"github.com/krelinga/video-in-be/tmdb"
@@ -139,5 +140,17 @@ func (*ConnectService) ProjectAbandon(ctx context.Context, req *connect.Request[
 	if !found {
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
 	}
+	return connect.NewResponse(resp), nil
+}
+
+func (*ConnectService) ProjectFinish(ctx context.Context, req *connect.Request[pb.ProjectFinishRequest]) (*connect.Response[pb.ProjectFinishResponse], error) {
+	resp := &pb.ProjectFinishResponse{}
+	found := state.ProjectReadAndRemove(req.Msg.Project, func(project *state.Project) error {
+		return publish.Do(project)
+	})
+	if !found {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
+	}
+
 	return connect.NewResponse(resp), nil
 }
