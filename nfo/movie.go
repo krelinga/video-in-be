@@ -38,7 +38,7 @@ type StreamDetails struct {
 type Video struct {
 	XMLName      struct{} `xml:"video"`
 	Codec        string   `xml:"codec"`
-	Aspect       string   `xml:"aspect"`
+	Aspect       string   `xml:"aspect,omitempty"`
 	Width        int      `xml:"width"`
 	Height       int      `xml:"height"`
 	DurationSecs int      `xml:"durationinseconds"`
