@@ -37,5 +37,5 @@ func (p Paths) ExtrasDir() string {
 }
 
 func (p Paths) name() string {
-	return fmt.Sprintf("%s (%d)", p.tmdbMovie.Title, p.tmdbMovie.ID)
+	return fmt.Sprintf("%s (%d)", p.tmdbMovie.Title, p.tmdbMovie.RealaseDate.Year())
 }
