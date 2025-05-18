@@ -14,6 +14,7 @@ var codecMapping = func() map[string]string {
 	return map[string]string{
 		"mpeg2video": "MPEG-2",
 		"ac3":        "AC3",
+		"h264":       "h264",
 	}
 }()
 
