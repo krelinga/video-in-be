@@ -3,11 +3,14 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"strconv"
 
 	pb "buf.build/gen/go/krelinga/proto/protocolbuffers/go/krelinga/video/in/v1"
 	"connectrpc.com/connect"
 	"github.com/krelinga/video-in-be/state"
+	"github.com/krelinga/video-in-be/thumbs"
 	"github.com/krelinga/video-in-be/tmdb"
 )
 
@@ -111,6 +114,27 @@ func (*ConnectService) ProjectSetMetadata(ctx context.Context, req *connect.Requ
 	}
 	found := state.ProjectModify(req.Msg.Project, func(project *state.Project) {
 		project.TmdbId = id
+	})
+	if !found {
+		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
+	}
+	return connect.NewResponse(resp), nil
+}
+
+func (*ConnectService) ProjectAbandon(ctx context.Context, req *connect.Request[pb.ProjectAbandonRequest]) (*connect.Response[pb.ProjectAbandonResponse], error) {
+	resp := &pb.ProjectAbandonResponse{}
+	found := state.ProjectReadAndRemove(req.Msg.Project, func(project *state.Project) error {
+		if err := os.RemoveAll(state.ProjectDir(project.Name)); err != nil {
+			return fmt.Errorf("could not remove project directory %s: %w", state.ProjectDir(project.Name), err)
+		}
+
+		// Remove thumbs
+		thumbsDir := thumbs.ProjectThumbsDir(project.Name)
+		if err := os.RemoveAll(thumbsDir); err != nil {
+			return fmt.Errorf("could not remove thumbs directory %s: %w", thumbsDir, err)
+		}
+
+		return nil
 	})
 	if !found {
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
