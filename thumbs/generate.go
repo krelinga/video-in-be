@@ -83,8 +83,12 @@ func getThumbOffset(d *disc, vf string) (time.Duration, error) {
 	return dur / 2, nil
 }
 
+func ProjectThumbsDir(project string) string {
+	return filepath.Join(env.ThumbsDir(), project)
+}
+
 func thumbsDir(d *disc) string {
-	return filepath.Join(env.ThumbsDir(), d.Project, d.Disc)
+	return filepath.Join(ProjectThumbsDir(d.Project), d.Disc)
 }
 
 func ffmpeg(d *disc, vf string, offset time.Duration) error {

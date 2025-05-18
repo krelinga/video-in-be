@@ -10,6 +10,7 @@ import (
 	"github.com/krelinga/video-in-be/nfo"
 	"github.com/krelinga/video-in-be/publish/paths"
 	"github.com/krelinga/video-in-be/state"
+	"github.com/krelinga/video-in-be/thumbs"
 	"github.com/krelinga/video-in-be/tmdb"
 )
 
@@ -127,9 +128,15 @@ func Do(project *state.Project) error {
 		}
 	}
 
-	// Finally, remove the project directory if nothing failed.
+	// Remove the project directory if nothing failed.
 	if err := os.RemoveAll(state.ProjectDir(project.Name)); err != nil {
 		return fmt.Errorf("could not remove project directory %s: %w", state.ProjectDir(project.Name), err)
+	}
+
+	// Remove thumbs
+	thumbsDir := thumbs.ProjectThumbsDir(project.Name)
+	if err := os.RemoveAll(thumbsDir); err != nil {
+		return fmt.Errorf("could not remove thumbs directory %s: %w", thumbsDir, err)
 	}
 
 	return nil
