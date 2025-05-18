@@ -87,7 +87,7 @@ func Do(project *state.Project) error {
 				outPath: outPath,
 			})
 			if file.Category == state.FileCatMainTitle {
-				mainPath = outPath
+				mainPath = inPath
 			}
 		}
 	}
