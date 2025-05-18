@@ -124,14 +124,15 @@ func (*ConnectService) ProjectSetMetadata(ctx context.Context, req *connect.Requ
 
 func (*ConnectService) ProjectAbandon(ctx context.Context, req *connect.Request[pb.ProjectAbandonRequest]) (*connect.Response[pb.ProjectAbandonResponse], error) {
 	resp := &pb.ProjectAbandonResponse{}
+	var err error
 	found := state.ProjectReadAndRemove(req.Msg.Project, func(project *state.Project) error {
-		if err := os.RemoveAll(state.ProjectDir(project.Name)); err != nil {
+		if err = os.RemoveAll(state.ProjectDir(project.Name)); err != nil {
 			return fmt.Errorf("could not remove project directory %s: %w", state.ProjectDir(project.Name), err)
 		}
 
 		// Remove thumbs
 		thumbsDir := thumbs.ProjectThumbsDir(project.Name)
-		if err := os.RemoveAll(thumbsDir); err != nil {
+		if err = os.RemoveAll(thumbsDir); err != nil {
 			return fmt.Errorf("could not remove thumbs directory %s: %w", thumbsDir, err)
 		}
 
@@ -140,16 +141,24 @@ func (*ConnectService) ProjectAbandon(ctx context.Context, req *connect.Request[
 	if !found {
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
 	}
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("could not abandon project: %w", err))
+	}
 	return connect.NewResponse(resp), nil
 }
 
 func (*ConnectService) ProjectFinish(ctx context.Context, req *connect.Request[pb.ProjectFinishRequest]) (*connect.Response[pb.ProjectFinishResponse], error) {
 	resp := &pb.ProjectFinishResponse{}
+	var err error
 	found := state.ProjectReadAndRemove(req.Msg.Project, func(project *state.Project) error {
-		return publish.Do(project)
+		err = publish.Do(project)
+		return err
 	})
 	if !found {
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("project not found"))
+	}
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("could not finish project: %w", err))
 	}
 
 	return connect.NewResponse(resp), nil
