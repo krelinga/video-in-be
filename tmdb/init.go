@@ -2,7 +2,6 @@ package tmdb
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/krelinga/video-in-be/env"
 	api "github.com/ryanbradynd05/go-tmdb"
@@ -24,7 +23,7 @@ func getGenre(id int) (string, bool) {
 func getPosterUrl(leaf string) string {
 	// TODO: validate that the poster sizes are large enough.
 	size := configuration.Images.PosterSizes[len(configuration.Images.PosterSizes)-4]
-	return filepath.Join(configuration.Images.SecureBaseURL, size, leaf)
+	return fmt.Sprintf("%s/%s/%s", configuration.Images.BaseURL, size, leaf)
 }
 
 func init() {
