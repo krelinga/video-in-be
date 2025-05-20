@@ -134,6 +134,12 @@ func ffmpeg(d *disc, vf string, offset time.Duration) error {
 				}
 				return ""
 			}(),
+			NumChapters: func() int32 {
+				if ch, ok := probe.GetNumChapters(); ok {
+					return ch
+				}
+				return 0
+			}(),
 		})
 	})
 	if !found {
