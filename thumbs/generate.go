@@ -14,6 +14,7 @@ import (
 	"github.com/krelinga/video-in-be/env"
 	"github.com/krelinga/video-in-be/ffprobe"
 	"github.com/krelinga/video-in-be/state"
+	"github.com/dustin/go-humanize"
 )
 
 func generateThumbs(in <-chan *disc) {
@@ -31,6 +32,8 @@ var (
 	ErrCouldNotReadDiscDir     = errors.New("could not read disc directory")
 	ErrCouldNotCreateThumbsDir = errors.New("could not create thumbs directory")
 	ErrFFMpeg                  = errors.New("ffmpeg error")
+	ErrFFProbe                 = errors.New("ffprobe error")
+	ErrStat                    = errors.New("stat error")
 )
 
 func generateDiscThumbs(d *disc) error {
@@ -102,7 +105,16 @@ func ffmpeg(d *disc, vf string, offset time.Duration) error {
 		return fmt.Errorf("%w: %w: %s", ErrFFMpeg, err, stderr.String())
 	}
 
-	var err error
+	probe, err := ffprobe.New(videoPath)
+	if err != nil {
+		return fmt.Errorf("%w: %w", ErrFFProbe, err)
+	}
+
+	stat, err := os.Stat(videoPath)
+	if err != nil {
+		return fmt.Errorf("%w: %w", ErrStat, err)
+	}
+
 	found := state.ProjectModify(d.Project, func(p *state.Project) {
 		disc := p.FindDiscByName(d.Disc)
 		if disc == nil {
@@ -115,6 +127,13 @@ func ffmpeg(d *disc, vf string, offset time.Duration) error {
 		disc.Files = append(disc.Files, &state.File{
 			Name:      vf,
 			Thumbnail: fmt.Sprintf("%s.jpg", vf),
+			HumanByteSize: humanize.IBytes(uint64(stat.Size())),
+			HumanDuration: func() string {
+				if d, ok := probe.GetDuration(); ok {
+					return d.String()
+				}
+				return ""
+			}(),
 		})
 	})
 	if !found {

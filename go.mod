@@ -6,6 +6,7 @@ require (
 	buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250517235252-6eef413800a6.1
 	buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250517235252-6eef413800a6.1
 	connectrpc.com/connect v1.18.1
+	github.com/dustin/go-humanize v1.0.1
 	github.com/google/uuid v1.6.0
 	github.com/ryanbradynd05/go-tmdb v0.0.0-20230108222638-2a68dc6ff40c
 	golang.org/x/net v0.23.0
