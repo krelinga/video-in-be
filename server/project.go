@@ -91,6 +91,9 @@ func (*ConnectService) ProjectGet(ctx context.Context, req *connect.Request[pb.P
 					File:     file.Name,
 					Category: string(file.Category),
 					Thumb:    file.Thumbnail,
+					HumanSize: file.HumanByteSize,
+					HumanDuration: file.HumanDuration,
+					NumChapters: file.NumChapters,
 				}
 				dProto.DiscFiles = append(dProto.DiscFiles, fProto)
 			}
