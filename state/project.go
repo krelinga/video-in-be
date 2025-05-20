@@ -66,9 +66,12 @@ func (d *Disc) FindFileByThumbnail(thumbnail string) *File {
 }
 
 type File struct {
-	Name      string  `json:"name"`
-	Category  FileCat `json:"category,omitempty"`
-	Thumbnail string  `json:"thumbnail,omitempty"`
+	Name          string  `json:"name"`
+	Category      FileCat `json:"category,omitempty"`
+	Thumbnail     string  `json:"thumbnail,omitempty"`
+	HumanByteSize string  `json:"human_byte_size,omitempty"`
+	HumanDuration string  `json:"human_duration,omitempty"`
+	NumChapters   int32   `json:"num_chapters,omitempty"`
 }
 
 var projectMutex = &sync.RWMutex{}
@@ -140,7 +143,7 @@ func ProjectReadAndRemove(name string, fn func(*Project) error) bool {
 					// Only remove this project if the function returns nil
 					return in
 				}
- 			} else {
+			} else {
 				out = append(out, x)
 			}
 		}
