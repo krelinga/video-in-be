@@ -3,8 +3,8 @@ module github.com/krelinga/video-in-be
 go 1.23.4
 
 require (
-	buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250517235252-6eef413800a6.1
-	buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250517235252-6eef413800a6.1
+	buf.build/gen/go/krelinga/proto/connectrpc/go v1.18.1-20250520014906-8df66cd15ed2.1
+	buf.build/gen/go/krelinga/proto/protocolbuffers/go v1.36.6-20250520014906-8df66cd15ed2.1
 	connectrpc.com/connect v1.18.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/google/uuid v1.6.0
