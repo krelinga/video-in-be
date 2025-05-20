@@ -61,3 +61,10 @@ func (f *FFProbe) GetAudioStreams() iter.Seq[*RawStream] {
 func (f *FFProbe) GetSubtitleStreams() iter.Seq[*RawStream] {
 	return f.getStreams("dvd_subtitle")
 }
+
+func (f *FFProbe) GetNumChapters() (int, bool) {
+	if f.Raw == nil || f.Raw.Chapters == nil {
+		return 0, false
+	}
+	return len(f.Raw.Chapters), true
+}

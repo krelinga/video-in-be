@@ -7,8 +7,9 @@ import (
 )
 
 type Raw struct {
-	Streams []*RawStream `json:"streams"`
-	Format  *RawFormat   `json:"format"`
+	Streams  []*RawStream  `json:"streams"`
+	Format   *RawFormat    `json:"format"`
+	Chapters []*RawChapter `json:"chapters"`
 }
 
 type RawStream struct {
@@ -61,4 +62,14 @@ type RawDisposition struct {
 
 type RawFormat struct {
 	Duration string `json:"duration"`
+}
+
+type RawChapter struct {
+	StartTime string `json:"start_time"`
+	EndTime   string `json:"end_time"`
+	Tags      *RawChapterTags `json:"tags"`
+}
+
+type RawChapterTags struct {
+	Title string `json:"title"`
 }

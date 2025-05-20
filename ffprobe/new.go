@@ -14,7 +14,7 @@ var (
 )
 
 func New(path string) (*FFProbe, error) {
-	cmd := exec.Command("ffprobe", "-i", path, "-print_format", "json", "-show_format", "-show_streams")
+	cmd := exec.Command("ffprobe", "-i", path, "-print_format", "json", "-show_format", "-show_streams", "-show_chapters")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
