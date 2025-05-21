@@ -15,6 +15,7 @@ func Run() {
 	demos := map[string]func() error{
 		"search_movies": searchMovies,
 		"movie_nfo":     movieNfo,
+		"refresh": refresh,
 	}
 	listDemos := func() string {
 		return "available demos: " + strings.Join(slices.Collect(maps.Keys(demos)), ", ")
