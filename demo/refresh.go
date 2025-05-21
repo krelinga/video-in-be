@@ -27,7 +27,7 @@ func refresh() error {
 				return filepath.Join(*directoryFlag, e.Name()), nil
 			}
 		}
-		return "", errors.New("No .nfo file found")
+		return "", errors.New("no .nfo file found")
 	}()
 	if err != nil {
 		return err
