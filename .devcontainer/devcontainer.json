@@ -10,6 +10,7 @@
 	"mounts": [
 		"source=/nas/media,target=/nas/media,type=bind"
 	],
+	"runArgs": ["-p", "25004:25004"],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
