@@ -60,6 +60,21 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 			return
 		}(),
 		Genres: movieDetails.Genres,
+		Directors: func() []*Director {
+			if len(movieDetails.Crew) == 0 {
+				return nil
+			}
+			out := make([]*Director, 0, 1)
+			for _, crew := range movieDetails.Crew {
+				if crew.Job == "Director" {
+					out = append(out, &Director{
+						Name:    crew.Name,
+						TmdbId:  crew.ID,
+					})
+				}
+			}
+			return out
+		}(),
 		Tags:   movieDetails.Keywords,
 		Actors: func() []*Actor {
 			out := make([]*Actor, 0, len(movieDetails.Actors))

@@ -74,13 +74,21 @@ type MovieDetails struct {
 	Runtime  time.Duration
 	Keywords []string
 	Actors   []*Actor
+	Crew     []*Crew
 }
 
 type Actor struct {
-	Name       string
-	Character  string
+	Name          string
+	Character     string
 	ProfilePicUrl string
-	ID         int
+	ID            int
+}
+
+type Crew struct {
+	Name          string
+	Job           string
+	ProfilePicUrl string
+	ID            int
 }
 
 func GetMovieDetails(id int) (*MovieDetails, error) {
@@ -114,24 +122,23 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 			Overview:      result.Overview,
 			Genres:        genres,
 			ImdbID:        result.ImdbID,
-			
 		},
 		Tagline: result.Tagline,
 		Runtime: time.Duration(result.Runtime) * time.Minute,
 		Keywords: func() []string {
-				if result.Keywords == nil {
-					return nil
+			if result.Keywords == nil {
+				return nil
+			}
+			out := make([]string, 0, len(result.Keywords.Keywords))
+			for _, k := range result.Keywords.Keywords {
+				if k.Name == "" {
+					log.Printf("Unknown keyword ID %d, skipping", k.ID)
+					continue
 				}
-				out := make([]string, 0, len(result.Keywords.Keywords))
-				for _, k := range result.Keywords.Keywords {
-					if k.Name == "" {
-						log.Printf("Unknown keyword ID %d, skipping", k.ID)
-						continue
-					}
-					out = append(out, k.Name)
-				}
-				return out
-			}(),
+				out = append(out, k.Name)
+			}
+			return out
+		}(),
 		Actors: func() []*Actor {
 			if result.Credits == nil {
 				return nil
@@ -143,10 +150,29 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 					continue
 				}
 				out = append(out, &Actor{
-					Name:       a.Name,
-					Character:  a.Character,
+					Name:          a.Name,
+					Character:     a.Character,
 					ProfilePicUrl: getProfilePicUrl(a.ProfilePath),
-					ID:         int(a.ID),
+					ID:            a.ID,
+				})
+			}
+			return out
+		}(),
+		Crew: func() []*Crew {
+			if result.Credits == nil {
+				return nil
+			}
+			out := make([]*Crew, 0, len(result.Credits.Crew))
+			for _, c := range result.Credits.Crew {
+				if c.Name == "" {
+					log.Printf("Unknown crew ID %d, skipping", c.ID)
+					continue
+				}
+				out = append(out, &Crew{
+					Name:          c.Name,
+					Job:           c.Job,
+					ProfilePicUrl: getProfilePicUrl(c.ProfilePath),
+					ID:            c.ID,
 				})
 			}
 			return out
