@@ -15,6 +15,7 @@ type MovieSearchResult struct {
 	Overview      string
 	Genres        []string
 	ImdbID        string
+	Keywords      []string
 }
 
 func convertGenreIDs(in []int32) []string {
@@ -75,7 +76,10 @@ type MovieDetails struct {
 }
 
 func GetMovieDetails(id int) (*MovieDetails, error) {
-	result, err := client.GetMovieInfo(id, nil)
+	options := map[string]string{
+		"append_to_response": "keywords",
+	}
+	result, err := client.GetMovieInfo(id, options)
 	if err != nil {
 		return nil, err
 	}
@@ -102,6 +106,20 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 			Overview:      result.Overview,
 			Genres:        genres,
 			ImdbID:        result.ImdbID,
+			Keywords: func() []string {
+				if result.Keywords == nil {
+					return nil
+				}
+				out := make([]string, 0, len(result.Keywords.Keywords))
+				for _, k := range result.Keywords.Keywords {
+					if k.Name == "" {
+						log.Printf("Unknown keyword ID %d, skipping", k.ID)
+						continue
+					}
+					out = append(out, k.Name)
+				}
+				return out
+			}(),
 		},
 		Tagline: result.Tagline,
 		Runtime: time.Duration(result.Runtime) * time.Minute,

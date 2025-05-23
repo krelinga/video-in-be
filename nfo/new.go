@@ -60,7 +60,7 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 			return
 		}(),
 		Genres: movieDetails.Genres,
-		// TODO: Add the tags
+		Tags:   movieDetails.Keywords,
 		FileInfo: &FileInfo{
 			StreamDetails: &StreamDetails{
 				Videos: slices.Collect(func(yield func(*Video) bool) {
