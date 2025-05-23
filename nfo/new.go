@@ -68,14 +68,14 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 			for _, crew := range movieDetails.Crew {
 				if crew.Job == "Director" {
 					out = append(out, &Director{
-						Name:    crew.Name,
-						TmdbId:  crew.ID,
+						Name:   crew.Name,
+						TmdbId: crew.ID,
 					})
 				}
 			}
 			return out
 		}(),
-		Tags:   movieDetails.Keywords,
+		Tags: movieDetails.Keywords,
 		Actors: func() []*Actor {
 			out := make([]*Actor, 0, len(movieDetails.Actors))
 			for _, actor := range movieDetails.Actors {
@@ -86,6 +86,24 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 					Profile: fmt.Sprintf("https://www.themoviedb.org/person/%d", actor.ID),
 					TmdbId:  actor.ID,
 				})
+			}
+			return out
+		}(),
+		Producers: func() []*Producer {
+			if len(movieDetails.Crew) == 0 {
+				return nil
+			}
+			out := make([]*Producer, 0, 5)
+			for _, crew := range movieDetails.Crew {
+				// TODO: this seems to catch other folks like casting ... unclear if this is correct.
+				// At least it matches the current behavior of the old system.
+				if crew.Department == "Production" {
+					out = append(out, &Producer{
+						Name:    crew.Name,
+						Profile: fmt.Sprintf("https://www.themoviedb.org/person/%d", crew.ID),
+						TmdbId:  crew.ID,
+					})
+				}
 			}
 			return out
 		}(),

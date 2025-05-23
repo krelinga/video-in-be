@@ -15,6 +15,7 @@ type Movie struct {
 	Directors     []*Director
 	Tags          []string `xml:"tag"`
 	Actors        []*Actor
+	Producers     []*Producer
 	FileInfo      *FileInfo
 }
 
@@ -70,5 +71,12 @@ type Actor struct {
 type Director struct {
 	XMLName struct{} `xml:"director"`
 	Name    string   `xml:",chardata"`
+	TmdbId  int      `xml:"tmdbid,attr"`
+}
+
+type Producer struct {
+	XMLName struct{} `xml:"producer"`
+	Name    string   `xml:"name"`
+	Profile string   `xml:"profile"`
 	TmdbId  int      `xml:"tmdbid,attr"`
 }

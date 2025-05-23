@@ -86,6 +86,7 @@ type Actor struct {
 
 type Crew struct {
 	Name          string
+	Department    string
 	Job           string
 	ProfilePicUrl string
 	ID            int
@@ -170,6 +171,7 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 				}
 				out = append(out, &Crew{
 					Name:          c.Name,
+					Department:    c.Department,
 					Job:           c.Job,
 					ProfilePicUrl: getProfilePicUrl(c.ProfilePath),
 					ID:            c.ID,
