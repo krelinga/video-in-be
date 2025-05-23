@@ -1,10 +1,11 @@
 package demo
 
 import (
-	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"flag"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 )
 
 var directoryFlag = flag.String("dir", "", "path to the directory to refresh")
+var diffNfoFlag = flag.Bool("diff_nfo", false, "print the diff between the old and new nfo files")
 
 func refresh() error {
 	// Make sure the existing directory has a .nfo file.
@@ -41,7 +43,7 @@ func refresh() error {
 			return nil, err
 		}
 		nfo := &nfo.Movie{}
-		if err := json.Unmarshal(data, nfo); err != nil {
+		if err := xml.Unmarshal(data, nfo); err != nil {
 			return nil, err
 		}
 		return nfo, nil
@@ -65,10 +67,20 @@ func refresh() error {
 	if err != nil {
 		return err
 	}
+	var tempNfoPath string
 	err = func() error {
-		f, err := os.Create(nfoPath)
+		f, err := func() (*os.File, error) {
+			if *diffNfoFlag {
+				return os.CreateTemp("", "diff_nfo_*")
+			} else {
+				return os.Create(nfoPath)
+			}
+		}()
 		if err != nil {
 			return err
+		}
+		if *diffNfoFlag {
+			tempNfoPath = f.Name()
 		}
 		defer f.Close()
 		if err := newNfo.Write(f); err != nil {
@@ -76,6 +88,19 @@ func refresh() error {
 		}
 		return nil
 	}()
+	if err != nil {
+		return err
+	}
 
-	return err
+	if *diffNfoFlag {
+		diffCmd := []string{"diff", "-u", nfoPath, tempNfoPath}
+		cmd := exec.Command(diffCmd[0], diffCmd[1:]...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil && err.Error() != "exit status 1" {
+			return err
+		}
+	}
+
+	return nil
 }
