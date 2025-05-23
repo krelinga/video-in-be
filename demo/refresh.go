@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"flag"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -99,6 +100,9 @@ func refresh() error {
 		cmd.Stderr = os.Stderr
 		if err := cmd.Run(); err != nil && err.Error() != "exit status 1" {
 			return err
+		}
+		if err := os.Remove(tempNfoPath); err != nil {
+			return fmt.Errorf("failed to remove temp nfo file: %w", err)
 		}
 	}
 
