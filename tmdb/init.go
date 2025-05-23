@@ -26,6 +26,11 @@ func getPosterUrl(leaf string) string {
 	return fmt.Sprintf("%s/%s/%s", configuration.Images.BaseURL, size, leaf)
 }
 
+func getProfilePicUrl(leaf string) string {
+	const size = "h632" // TODO: Confirm that this size is in configuration.Images.ProfileSizes
+	return configuration.Images.BaseURL + size + leaf
+}
+
 func init() {
 	config := api.Config{
 		APIKey: env.TMDbKey(),

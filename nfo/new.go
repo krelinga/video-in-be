@@ -61,6 +61,19 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 		}(),
 		Genres: movieDetails.Genres,
 		Tags:   movieDetails.Keywords,
+		Actors: func() []*Actor {
+			out := make([]*Actor, 0, len(movieDetails.Actors))
+			for _, actor := range movieDetails.Actors {
+				out = append(out, &Actor{
+					Name:    actor.Name,
+					Role:    actor.Character,
+					Thumb:   actor.ProfilePicUrl,
+					Profile: fmt.Sprintf("https://www.themoviedb.org/person/%d", actor.ID),
+					TmdbId:  actor.ID,
+				})
+			}
+			return out
+		}(),
 		FileInfo: &FileInfo{
 			StreamDetails: &StreamDetails{
 				Videos: slices.Collect(func(yield func(*Video) bool) {

@@ -13,6 +13,7 @@ type Movie struct {
 	UniqueIds     []*UniqueId
 	Genres        []string `xml:"genre"`
 	Tags          []string `xml:"tag"`
+	Actors        []*Actor
 	FileInfo      *FileInfo
 }
 
@@ -54,4 +55,13 @@ type Audio struct {
 type Subtitle struct {
 	XMLName  struct{} `xml:"subtitle"`
 	Language string   `xml:"language"`
+}
+
+type Actor struct {
+	XMLName struct{} `xml:"actor"`
+	Name    string   `xml:"name"`
+	Role    string   `xml:"role"`
+	Thumb   string   `xml:"thumb"`
+	Profile string   `xml:"profile"`
+	TmdbId  int      `xml:"tmdbid"`
 }

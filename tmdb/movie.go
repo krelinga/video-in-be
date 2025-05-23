@@ -15,7 +15,6 @@ type MovieSearchResult struct {
 	Overview      string
 	Genres        []string
 	ImdbID        string
-	Keywords      []string
 }
 
 func convertGenreIDs(in []int32) []string {
@@ -71,13 +70,22 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 
 type MovieDetails struct {
 	MovieSearchResult
-	Tagline string
-	Runtime time.Duration
+	Tagline  string
+	Runtime  time.Duration
+	Keywords []string
+	Actors   []*Actor
+}
+
+type Actor struct {
+	Name       string
+	Character  string
+	ProfilePicUrl string
+	ID         int
 }
 
 func GetMovieDetails(id int) (*MovieDetails, error) {
 	options := map[string]string{
-		"append_to_response": "keywords",
+		"append_to_response": "keywords,credits",
 	}
 	result, err := client.GetMovieInfo(id, options)
 	if err != nil {
@@ -106,7 +114,11 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 			Overview:      result.Overview,
 			Genres:        genres,
 			ImdbID:        result.ImdbID,
-			Keywords: func() []string {
+			
+		},
+		Tagline: result.Tagline,
+		Runtime: time.Duration(result.Runtime) * time.Minute,
+		Keywords: func() []string {
 				if result.Keywords == nil {
 					return nil
 				}
@@ -120,9 +132,25 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 				}
 				return out
 			}(),
-		},
-		Tagline: result.Tagline,
-		Runtime: time.Duration(result.Runtime) * time.Minute,
+		Actors: func() []*Actor {
+			if result.Credits == nil {
+				return nil
+			}
+			out := make([]*Actor, 0, len(result.Credits.Cast))
+			for _, a := range result.Credits.Cast {
+				if a.Name == "" {
+					log.Printf("Unknown actor ID %d, skipping", a.ID)
+					continue
+				}
+				out = append(out, &Actor{
+					Name:       a.Name,
+					Character:  a.Character,
+					ProfilePicUrl: getProfilePicUrl(a.ProfilePath),
+					ID:         int(a.ID),
+				})
+			}
+			return out
+		}(),
 	}
 	return out, nil
 }
