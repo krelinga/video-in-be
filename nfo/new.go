@@ -41,13 +41,24 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 		Tagline:       movieDetails.Tagline,
 		Runtime:       int(movieDetails.Runtime.Minutes()),
 		TmdbId:        int(movieDetails.ID),
-		UniqueIds: []*UniqueId{
-			{
-				Id:      fmt.Sprintf("%d", movieDetails.ID),
-				Default: true,
-				Type:    "tmdb",
-			},
-		},
+		UniqueIds: func() (out []*UniqueId) {
+			out = [](*UniqueId){
+				{
+					Id:      fmt.Sprintf("%d", movieDetails.ID),
+					Default: true,
+					Type:    "tmdb",
+				},
+			}
+
+			if movieDetails.ImdbID != "" {
+				out = append(out, &UniqueId{
+					Id:   movieDetails.ImdbID,
+					Type: "imdb",
+				})
+			}
+
+			return
+		}(),
 		Genres: movieDetails.Genres,
 		// TODO: Add the tags
 		FileInfo: &FileInfo{

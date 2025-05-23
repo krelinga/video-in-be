@@ -14,6 +14,7 @@ type MovieSearchResult struct {
 	RealaseDate   time.Time
 	Overview      string
 	Genres        []string
+	ImdbID        string
 }
 
 func convertGenreIDs(in []int32) []string {
@@ -100,6 +101,7 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 			RealaseDate:   releaseDate,
 			Overview:      result.Overview,
 			Genres:        genres,
+			ImdbID:        result.ImdbID,
 		},
 		Tagline: result.Tagline,
 		Runtime: time.Duration(result.Runtime) * time.Minute,
