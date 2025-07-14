@@ -35,6 +35,17 @@ jobs:
           cd e2e_test
           go mod download
       
+      - name: Format check (main module)
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "Go files are not formatted. Please run 'go fmt ./...'"
+            gofmt -l .
+            exit 1
+          fi
+      
+      - name: Run go vet (main module)
+        run: go vet ./...
+      
       - name: Run tests in main module
         run: go test ./... -v
       

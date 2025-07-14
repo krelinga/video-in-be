@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dustin/go-humanize"
 	"github.com/krelinga/video-in-be/env"
 	"github.com/krelinga/video-in-be/ffprobe"
 	"github.com/krelinga/video-in-be/state"
-	"github.com/dustin/go-humanize"
 )
 
 func generateThumbs(in <-chan *disc) {
@@ -125,8 +125,8 @@ func ffmpeg(d *disc, vf string, offset time.Duration) error {
 			panic("file state already exists")
 		}
 		disc.Files = append(disc.Files, &state.File{
-			Name:      vf,
-			Thumbnail: fmt.Sprintf("%s.jpg", vf),
+			Name:          vf,
+			Thumbnail:     fmt.Sprintf("%s.jpg", vf),
 			HumanByteSize: humanize.IBytes(uint64(stat.Size())),
 			HumanDuration: func() string {
 				if d, ok := probe.GetDuration(); ok {
