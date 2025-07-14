@@ -4,9 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
-	"os/exec"
-	"syscall"
 	"testing"
 	"time"
 
@@ -21,7 +18,6 @@ import (
 
 // TestDockerBuild tests that the Dockerfile can build successfully  
 func TestDockerBuild(t *testing.T) {
-	// Skip if Docker isn't available or if we're having network issues
 	if testing.Short() {
 		t.Skip("Skipping Docker build test in short mode")
 	}
@@ -45,66 +41,6 @@ func TestDockerBuild(t *testing.T) {
 	}
 	
 	t.Log("✅ Docker image built successfully")
-}
-
-// TestEndToEndServerLocal tests the server without Docker containers
-func TestEndToEndServerLocal(t *testing.T) {
-	// Build the server binary
-	cmd := exec.Command("go", "build", "-o", "test-server", ".")
-	cmd.Dir = ".."
-	cmd.Env = append(os.Environ(), 
-		"VIDEOIN_PROJECTDIR=/tmp",
-		"VIDEOIN_STATEDIR=/tmp", 
-		"VIDEOIN_UNCLAIMEDDIR=/tmp",
-		"VIDEOIN_THUMBSDIR=/tmp",
-		"VIDEOIN_TMDBKEY=test-key",
-		"VIDEOIN_LIBRARYDIR=/tmp",
-	)
-	
-	err := cmd.Run()
-	require.NoError(t, err, "Should be able to build server binary")
-	defer os.Remove("../test-server")
-
-	// Start the server
-	serverCmd := exec.Command("../test-server", "-mode", "server")
-	serverCmd.Dir = "."
-	serverCmd.Env = append(os.Environ(),
-		"VIDEOIN_PROJECTDIR=/tmp",
-		"VIDEOIN_STATEDIR=/tmp",
-		"VIDEOIN_UNCLAIMEDDIR=/tmp", 
-		"VIDEOIN_THUMBSDIR=/tmp",
-		"VIDEOIN_TMDBKEY=test-key",
-		"VIDEOIN_LIBRARYDIR=/tmp",
-	)
-	
-	err = serverCmd.Start()
-	require.NoError(t, err, "Should be able to start server")
-	defer func() {
-		if serverCmd.Process != nil {
-			serverCmd.Process.Signal(syscall.SIGTERM)
-			serverCmd.Wait()
-		}
-	}()
-
-	// Wait for server to start
-	time.Sleep(3 * time.Second)
-
-	// Create Connect RPC client
-	baseURL := "http://localhost:25004"
-	client := pbconnect.NewServiceClient(http.DefaultClient, baseURL)
-
-	// Test HelloWorld RPC call
-	request := &pb.HelloWorldRequest{
-		Name: "LocalTestUser",
-	}
-
-	ctx := context.Background()
-	response, err := client.HelloWorld(ctx, connect.NewRequest(request))
-	require.NoError(t, err)
-	assert.NotNil(t, response)
-	assert.Equal(t, "Hello, LocalTestUser", response.Msg.Message)
-	
-	t.Log("✅ Local end-to-end test completed successfully")
 }
 
 func TestEndToEndServer(t *testing.T) {
@@ -173,6 +109,4 @@ func TestEndToEndServer(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, "Hello, DockerTestUser", response.Msg.Message)
-	
-	t.Log("✅ Docker-based end-to-end test completed successfully")
 }

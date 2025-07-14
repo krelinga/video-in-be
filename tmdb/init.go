@@ -33,7 +33,6 @@ func getProfilePicUrl(leaf string) string {
 
 func init() {
 	apiKey := env.TMDbKey()
-	fmt.Printf("TMDb API Key: '%s'\n", apiKey)
 	
 	// Skip actual API calls for test keys to allow testing
 	if apiKey == "test-key" || apiKey == "dummy-key-for-testing" {
