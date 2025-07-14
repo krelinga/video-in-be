@@ -1,0 +1,61 @@
+name: Run Tests
+
+on:
+  # Trigger on all pushes to any branch
+  push:
+    branches: ['**']
+  
+  # Trigger on pull requests
+  pull_request:
+    branches: ['**']
+  
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run All Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.4'
+          cache: true
+      
+      - name: Download dependencies for main module
+        run: go mod download
+      
+      - name: Download dependencies for e2e tests
+        run: |
+          cd e2e_test
+          go mod download
+      
+      - name: Format check (main module)
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "Go files are not formatted. Please run 'go fmt ./...'"
+            gofmt -l .
+            exit 1
+          fi
+      
+      - name: Run go vet (main module)
+        run: go vet ./...
+      
+      - name: Run tests in main module
+        run: go test ./... -v
+      
+      - name: Run e2e tests (short mode - fast tests)
+        run: |
+          cd e2e_test
+          go test -v -short
+      
+      - name: Run e2e tests (full mode - including Docker tests)
+        run: |
+          cd e2e_test
+          go test -v
+        continue-on-error: true  # Allow this to fail since Docker tests may be flaky

@@ -33,14 +33,14 @@ func getProfilePicUrl(leaf string) string {
 
 func init() {
 	apiKey := env.TMDbKey()
-	
+
 	// Skip actual API calls for test keys to allow testing
 	if apiKey == "test-key" || apiKey == "dummy-key-for-testing" {
 		fmt.Println("Using test mode for TMDb - skipping API calls")
 		// Initialize with dummy data for testing
 		movieGenreMap = map[int]string{
 			28: "Action",
-			35: "Comedy", 
+			35: "Comedy",
 		}
 		configuration = &api.Configuration{
 			Images: struct {
@@ -52,8 +52,8 @@ func init() {
 				ProfileSizes  []string `json:"profile_sizes"`
 				StillSizes    []string `json:"still_sizes"`
 			}{
-				BaseURL: "https://image.tmdb.org/t/p/",
-				PosterSizes: []string{"w92", "w154", "w185", "w342", "w500", "w780", "original"},
+				BaseURL:      "https://image.tmdb.org/t/p/",
+				PosterSizes:  []string{"w92", "w154", "w185", "w342", "w500", "w780", "original"},
 				ProfileSizes: []string{"w45", "w185", "h632", "original"},
 			},
 		}

@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ErrQueueFull = errors.New("queue is full")
-	ErrUnknownDisc = errors.New("unknown disc")
-	ErrDiscState = errors.New("disc state error")
+	ErrQueueFull      = errors.New("queue is full")
+	ErrUnknownDisc    = errors.New("unknown disc")
+	ErrDiscState      = errors.New("disc state error")
 	ErrUnknownProject = errors.New("unknown project")
 )
 

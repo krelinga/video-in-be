@@ -65,8 +65,8 @@ type RawFormat struct {
 }
 
 type RawChapter struct {
-	StartTime string `json:"start_time"`
-	EndTime   string `json:"end_time"`
+	StartTime string          `json:"start_time"`
+	EndTime   string          `json:"end_time"`
 	Tags      *RawChapterTags `json:"tags"`
 }
 
