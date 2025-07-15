@@ -28,7 +28,7 @@ func TestDockerBuild(t *testing.T) {
 	_, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
 			FromDockerfile: testcontainers.FromDockerfile{
-				Context:    "..",         // Parent directory (repository root)
+				Context:    "..", // Parent directory (repository root)
 			},
 		},
 		Started: false, // Only build, don't start
@@ -47,7 +47,7 @@ func TestEndToEndServer(t *testing.T) {
 	// Use the vendor-based Dockerfile to avoid network issues in tests
 	req := testcontainers.ContainerRequest{
 		FromDockerfile: testcontainers.FromDockerfile{
-			Context:    "..",              // Parent directory (repository root)
+			Context:    "..", // Parent directory (repository root)
 		},
 		ExposedPorts: []string{"25004/tcp"},
 		Env: map[string]string{
