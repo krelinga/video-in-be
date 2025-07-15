@@ -28,19 +28,13 @@ func TestDockerBuild(t *testing.T) {
 	_, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
 			FromDockerfile: testcontainers.FromDockerfile{
-				Context:    "..",              // Parent directory (repository root)
-				Dockerfile: "Dockerfile.test", // Use vendor-based build
+				Context:    "..",         // Parent directory (repository root)
 			},
 		},
 		Started: false, // Only build, don't start
 	})
 
-	if err != nil {
-		t.Skipf("Docker build failed (likely due to network issues): %v", err)
-		return
-	}
-
-	t.Log("✅ Docker image built successfully")
+	assert.NoError(t, err, "Docker build failed")
 }
 
 func TestEndToEndServer(t *testing.T) {
@@ -54,7 +48,6 @@ func TestEndToEndServer(t *testing.T) {
 	req := testcontainers.ContainerRequest{
 		FromDockerfile: testcontainers.FromDockerfile{
 			Context:    "..",              // Parent directory (repository root)
-			Dockerfile: "Dockerfile.test", // Use vendor-based build
 		},
 		ExposedPorts: []string{"25004/tcp"},
 		Env: map[string]string{
@@ -75,8 +68,7 @@ func TestEndToEndServer(t *testing.T) {
 		Started:          true,
 	})
 
-	if err != nil {
-		t.Skipf("Container test failed (likely due to network issues): %v", err)
+	if !assert.NoError(t, err, "Docker build failed") {
 		return
 	}
 
