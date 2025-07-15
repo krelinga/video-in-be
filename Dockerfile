@@ -4,10 +4,8 @@ FROM golang:1.23.4 AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
-# Update certificates and configure Go for proxy issues
+# Update certificates
 RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
-ENV GOPROXY=direct
-ENV GOSUMDB=off
 
 # Copy the Go module files and download dependencies
 COPY go.mod go.sum ./
