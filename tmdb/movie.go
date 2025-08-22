@@ -60,44 +60,44 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 		outResult := &MovieSearchResult{}
 
 		if id, err := r.ID(); err != nil {
-			return nil, fmt.Errorf("Failed to get ID for movie at index %d: %v", i, err)
+			return nil, fmt.Errorf("failed to get ID for movie at index %d: %v", i, err)
 		} else {
 			outResult.ID = int(id)
 		}
 		if originalTitle, err := r.OriginalTitle(); err != nil {
-			return nil, fmt.Errorf("Failed to get OriginalTitle for movie at index %d: %v", i, err)
+			return nil, fmt.Errorf("failed to get OriginalTitle for movie at index %d: %v", i, err)
 		} else {
 			outResult.OriginalTitle = originalTitle
 		}
 		if posterPath, err := r.PosterPath(); err != nil {
-			return nil, fmt.Errorf("Failed to get PosterPath for movie at index %d: %v", i, err)
+			return nil, fmt.Errorf("failed to get PosterPath for movie at index %d: %v", i, err)
 		} else {
 			outResult.PosterUrl = getPosterUrl(posterPath)
 		}
 		if title, err := r.Title(); err != nil {
-			return nil, fmt.Errorf("Failed to get Title for movie at index %d: %v", i, err)
+			return nil, fmt.Errorf("failed to get Title for movie at index %d: %v", i, err)
 		} else {
 			outResult.Title = title
 		}
 		if releaseDate, err := r.ReleaseDate(); err != nil {
-			return nil, fmt.Errorf("Failed to get ReleaseDate for movie at index %d: %v", i, err)
+			return nil, fmt.Errorf("failed to get ReleaseDate for movie at index %d: %v", i, err)
 		} else if convertedReleaseDate, err := convertReleaseDate(releaseDate); err != nil {
-			return nil, fmt.Errorf("Failed to parse ReleaseDate for movie at index %d: %v", i, err)
+			return nil, fmt.Errorf("failed to parse ReleaseDate for movie at index %d: %v", i, err)
 		} else {
 			outResult.RealaseDate = convertedReleaseDate
 		}
 		if overview, err := r.Overview(); err != nil {
-			return nil, fmt.Errorf("Failed to get Overview for movie at index %d: %w", i, err)
+			return nil, fmt.Errorf("failed to get Overview for movie at index %d: %w", i, err)
 		} else {
 			outResult.Overview = overview
 		}
 		if genreIds, err := r.GenreIDs(); err != nil {
-			return nil, fmt.Errorf("Failed to get GenreIDs for movie at index %d: %v", i, err)
+			return nil, fmt.Errorf("failed to get GenreIDs for movie at index %d: %v", i, err)
 		} else {
 			outResult.Genres = convertGenreIDs(genreIds)
 		}
 		if imdbID, err := r.IMDBID(); err != nil {
-			return nil, fmt.Errorf("Failed to get ImdbID for movie at index %d: %v", i, err)
+			return nil, fmt.Errorf("failed to get ImdbID for movie at index %d: %v", i, err)
 		} else {
 			outResult.ImdbID = imdbID
 		}
