@@ -46,7 +46,7 @@ func convertReleaseDate(in string) (time.Time, error) {
 }
 
 func zeroDefault[T any](in T, err error) (T, error) {
-	if errors.Is(err, api.ErrFieldNotFound) {
+	if errors.Is(err, api.ErrFieldNotFound) || errors.Is(err, api.ErrNullValue) {
 		var zero T
 		return zero, nil
 	}
