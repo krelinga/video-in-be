@@ -1,16 +1,18 @@
 package tmdb
 
 import (
+	"context"
 	"fmt"
+	"slices"
 
+	api "github.com/krelinga/go-tmdb"
 	"github.com/krelinga/video-in-be/env"
-	api "github.com/ryanbradynd05/go-tmdb"
 )
 
 var (
-	client        *api.TMDb
+	client        api.Client
 	movieGenreMap map[int]string
-	configuration *api.Configuration
+	configuration api.ConfigDetails
 )
 
 func getGenre(id int) (string, bool) {
@@ -21,18 +23,46 @@ func getGenre(id int) (string, bool) {
 }
 
 func getPosterUrl(leaf string) string {
-	// TODO: validate that the poster sizes are large enough.
-	size := configuration.Images.PosterSizes[len(configuration.Images.PosterSizes)-4]
-	return fmt.Sprintf("%s/%s/%s", configuration.Images.BaseURL, size, leaf)
+	// TODO: handle errors instead of returning empty string.
+	const offset = -4
+	if images, err := configuration.Images(); err != nil {
+		return ""
+	} else if baseUrl, err := images.BaseURL(); err != nil {
+		return ""
+	} else if posterSizes, err := images.PosterSizes(); err != nil {
+		return ""
+	} else if len(posterSizes) < 4 {
+		return ""
+	} else {
+		return fmt.Sprintf("%s/%s/%s", baseUrl, posterSizes[len(posterSizes)+offset], leaf)
+	}
 }
 
 func getProfilePicUrl(leaf string) string {
-	const size = "h632" // TODO: Confirm that this size is in configuration.Images.ProfileSizes
-	return configuration.Images.BaseURL + size + leaf
+	// TODO: handle error instead of returning empty string.
+	const size = "h632"
+	if images, err := configuration.Images(); err != nil {
+		return ""
+	} else if profileSizes, err := images.ProfileSizes(); err != nil {
+		return ""
+	} else if slices.Index(profileSizes, "h632") == -1 {
+		return ""
+	} else if baseUrl, err := images.BaseURL(); err != nil {
+		return ""
+	} else if profileSizes, err := images.ProfileSizes(); err != nil {
+		return ""
+	} else if slices.Index(profileSizes, "h632") == -1 {
+		return ""
+	} else {
+		return fmt.Sprintf("%s/%s/%s", baseUrl, size, leaf)
+	}
 }
 
 func init() {
 	apiKey := env.TMDbKey()
+	client = api.ClientOptions{
+		APIKey: apiKey,
+	}.NewClient()
 
 	// Skip actual API calls for test keys to allow testing
 	if apiKey == "test-key" || apiKey == "dummy-key-for-testing" {
@@ -42,46 +72,37 @@ func init() {
 			28: "Action",
 			35: "Comedy",
 		}
-		configuration = &api.Configuration{
-			Images: struct {
-				BaseURL       string   `json:"base_url"`
-				SecureBaseURL string   `json:"secure_base_url"`
-				BackdropSizes []string `json:"backdrop_sizes"`
-				LogoSizes     []string `json:"logo_sizes"`
-				PosterSizes   []string `json:"poster_sizes"`
-				ProfileSizes  []string `json:"profile_sizes"`
-				StillSizes    []string `json:"still_sizes"`
-			}{
-				BaseURL:      "https://image.tmdb.org/t/p/",
-				PosterSizes:  []string{"w92", "w154", "w185", "w342", "w500", "w780", "original"},
-				ProfileSizes: []string{"w45", "w185", "h632", "original"},
+		configuration = api.ConfigDetails{
+			"images": api.ConfigImages{
+				"base_url":      "https://image.tmdb.org/t/p/",
+				"poster_sizes":  []string{"w92", "w154", "w185", "w342", "w500", "w780", "original"},
+				"profile_sizes": []string{"w45", "w185", "h632", "original"},
 			},
 		}
-		// Still need to init the client for potential function calls
-		config := api.Config{
-			APIKey: apiKey,
-		}
-		client = api.Init(config)
 		return
 	}
 
-	config := api.Config{
-		APIKey: apiKey,
-	}
-	client = api.Init(config)
-
 	// Prefetch genre mapping
-	genres, err := client.GetMovieGenres(nil)
-	if err != nil {
-		panic(fmt.Sprintf("failed to fetch TMDb genres: %v", err))
-	}
 	movieGenreMap = make(map[int]string)
-	for _, mapping := range genres.Genres {
-		movieGenreMap[int(mapping.ID)] = mapping.Name
+	if genres, err := api.GetMovieGenres(context.Background(), client); err != nil {
+		panic(fmt.Sprintf("failed to fetch TMDb genres: %v", err))
+	} else if genreList, err := genres.Genres(); err != nil {
+		panic(fmt.Sprintf("failed to parse TMDb genres: %v", err))
+	} else {
+		for _, mapping := range genreList {
+			if id, err := mapping.ID(); err != nil {
+				continue
+			} else if name, err := mapping.Name(); err != nil {
+				continue
+			} else {
+				movieGenreMap[int(id)] = name
+			}
+		}
 	}
 
 	// Prefetch configuration
-	configuration, err = client.GetConfiguration()
+	var err error
+	configuration, err = api.GetConfigDetails(context.Background(), client)
 	if err != nil {
 		panic(fmt.Sprintf("failed to fetch TMDb configuration: %v", err))
 	}
