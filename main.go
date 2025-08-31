@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/krelinga/video-in-be/demo"
+	"github.com/krelinga/video-in-be/manual"
 	"github.com/krelinga/video-in-be/server"
 )
 
@@ -24,8 +25,10 @@ func main() {
 		server.Start()
 	case "demo":
 		demo.Run()
+	case "manual":
+		manual.WriteNfo()
 	default:
-		fmt.Fprintf(os.Stderr, "Unknown mode: %s, supported modes are 'server' and 'demo'\n", mode)
+		fmt.Fprintf(os.Stderr, "Unknown mode: %s, supported modes are 'server', 'demo' and 'manual'\n", mode)
 		os.Exit(1)
 	}
 }
