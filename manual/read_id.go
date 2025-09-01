@@ -13,18 +13,13 @@ func readTmdbIdFromFile(nfoPath string) (int, error) {
 	}
 
 	var nfo struct {
-		Movie *struct {
-			TmdbID *int `xml:"tmdbid"`
-		} `xml:"movie"`
+		TmdbID *int `xml:"tmdbid"`
 	}
 	if err := xml.Unmarshal(data, &nfo); err != nil {
 		return 0, err
 	}
-	if nfo.Movie == nil {
-		return 0, errors.New("movie element is missing")
-	}
-	if nfo.Movie.TmdbID == nil {
+	if nfo.TmdbID == nil {
 		return 0, errors.New("tmdbid element is missing")
 	}
-	return *nfo.Movie.TmdbID, nil
+	return *nfo.TmdbID, nil
 }
