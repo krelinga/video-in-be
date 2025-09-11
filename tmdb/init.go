@@ -22,19 +22,23 @@ func getGenre(id int) (string, bool) {
 	return "", false
 }
 
+func imageUrl(base, size, leaf string) string {
+	return base + size + leaf
+}
+
 func getPosterUrl(leaf string) string {
 	// TODO: handle errors instead of returning empty string.
-	const offset = -4
+	const offset = 4
 	if images, err := configuration.Images(); err != nil {
 		return ""
 	} else if baseUrl, err := images.BaseURL(); err != nil {
 		return ""
 	} else if posterSizes, err := images.PosterSizes(); err != nil {
 		return ""
-	} else if len(posterSizes) < 4 {
+	} else if len(posterSizes) < offset {
 		return ""
 	} else {
-		return fmt.Sprintf("%s/%s/%s", baseUrl, posterSizes[len(posterSizes)+offset], leaf)
+		return imageUrl(baseUrl, posterSizes[len(posterSizes)-offset], leaf)
 	}
 }
 
@@ -45,7 +49,7 @@ func getPosterUrlOrig(leaf string) string {
 	} else if baseUrl, err := images.BaseURL(); err != nil {
 		return ""
 	} else {
-		return fmt.Sprintf("%s%s%s", baseUrl, "original", leaf)
+		return imageUrl(baseUrl, "original", leaf)
 	}
 }
 
@@ -56,16 +60,16 @@ func getProfilePicUrl(leaf string) string {
 		return ""
 	} else if profileSizes, err := images.ProfileSizes(); err != nil {
 		return ""
-	} else if slices.Index(profileSizes, "h632") == -1 {
+	} else if slices.Index(profileSizes, size) == -1 {
 		return ""
 	} else if baseUrl, err := images.BaseURL(); err != nil {
 		return ""
 	} else if profileSizes, err := images.ProfileSizes(); err != nil {
 		return ""
-	} else if slices.Index(profileSizes, "h632") == -1 {
+	} else if slices.Index(profileSizes, size) == -1 {
 		return ""
 	} else {
-		return fmt.Sprintf("%s/%s/%s", baseUrl, size, leaf)
+		return imageUrl(baseUrl, size, leaf)
 	}
 }
 
