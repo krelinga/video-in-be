@@ -69,6 +69,18 @@ func TestEndToEndServer(t *testing.T) {
 	})
 
 	if !assert.NoError(t, err, "Docker build failed") {
+		// If the container was created, try to fetch logs for debugging
+		if container != nil {
+			logs, logErr := container.Logs(ctx)
+			if logErr == nil && logs != nil {
+				defer logs.Close()
+				buf := make([]byte, 4096)
+				n, _ := logs.Read(buf)
+				t.Logf("Container logs:\n%s", string(buf[:n]))
+			} else if logErr != nil {
+				t.Logf("Could not fetch container logs: %v", logErr)
+			}
+		}
 		return
 	}
 
