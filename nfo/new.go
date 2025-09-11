@@ -80,6 +80,7 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 		}(),
 		MPAA:          mpaaRating,
 		Certification: mpaaRating,
+		ID:            movieDetails.ImdbID,
 		UniqueIds: func() (out []*UniqueId) {
 			out = [](*UniqueId){
 				{

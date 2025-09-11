@@ -12,6 +12,7 @@ type Movie struct {
 	Thumbs        []*Thumb
 	MPAA          string `xml:"mpaa,omitempty"`
 	Certification string `xml:"certification,omitempty"`
+	ID            string `xml:"id,omitempty"`
 	TmdbId        int    `xml:"tmdbid"`
 	UniqueIds     []*UniqueId
 	Genres        []string `xml:"genre"`
