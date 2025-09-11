@@ -9,7 +9,8 @@ type Movie struct {
 	Outline       string   `xml:"outline"`
 	Tagline       string   `xml:"tagline"`
 	Runtime       int      `xml:"runtime"`
-	TmdbId        int      `xml:"tmdbid"`
+	Thumbs        []*Thumb
+	TmdbId        int `xml:"tmdbid"`
 	UniqueIds     []*UniqueId
 	Genres        []string `xml:"genre"`
 	Directors     []*Director
@@ -79,4 +80,10 @@ type Producer struct {
 	Name    string   `xml:"name"`
 	Profile string   `xml:"profile"`
 	TmdbId  int      `xml:"tmdbid,attr"`
+}
+
+type Thumb struct {
+	XMLName struct{} `xml:"thumb"`
+	Aspect  string   `xml:"aspect,omitempty,attr"`
+	URL     string   `xml:",chardata"`
 }

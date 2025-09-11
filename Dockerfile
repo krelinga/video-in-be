@@ -39,6 +39,7 @@ EXPOSE 25004
 # VIDEOIN_UNCLAIMEDDIR: Directory for unclaimed files.
 # VIDEOIN_THUMBSDIR: Directory for thumbnail files.
 # VIDEOIN_TMDBKEY: TMDB API key for metadata fetching.
+# VIDEOIN_FANARTAPIKEY: Fanart API key for fetching artwork.
 # VIDEOIN_LIBRARYDIR: Directory for the video library.
 
 # Command to run the binary

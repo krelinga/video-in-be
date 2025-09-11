@@ -1,9 +1,11 @@
 package demo
 
 import (
+	"context"
 	"flag"
 	"os"
 
+	"github.com/krelinga/video-in-be/fanart"
 	"github.com/krelinga/video-in-be/ffprobe"
 	"github.com/krelinga/video-in-be/nfo"
 	"github.com/krelinga/video-in-be/tmdb"
@@ -21,7 +23,11 @@ func movieNfo() error {
 	if err != nil {
 		return err
 	}
-	movie, err := nfo.NewMovie(movieDetails, fileInfo)
+	art, err := fanart.GetArtURLs(context.Background(), id)
+	if err != nil {
+		return err
+	}
+	movie, err := nfo.NewMovie(movieDetails, fileInfo, art)
 	if err != nil {
 		return err
 	}

@@ -1,11 +1,13 @@
 package nfo
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"log"
 	"slices"
 
+	"github.com/krelinga/video-in-be/fanart"
 	"github.com/krelinga/video-in-be/ffprobe"
 	"github.com/krelinga/video-in-be/tmdb"
 )
@@ -26,7 +28,7 @@ func translateCodec(codec string) (string, error) {
 	return "", fmt.Errorf("unknown codec: %q", codec)
 }
 
-func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outMovie *Movie, outError error) {
+func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art fanart.ArtURLs) (outMovie *Movie, outError error) {
 	setError := func(err error) {
 		if outError == nil {
 			outError = err
@@ -42,6 +44,30 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 		Tagline:       movieDetails.Tagline,
 		Runtime:       int(movieDetails.Runtime.Minutes()),
 		TmdbId:        int(movieDetails.ID),
+		Thumbs: func() (out []*Thumb) {
+			hasPoster := false
+			if movieDetails.PosterUrl != "" {
+				hasPoster = true
+				out = append(out, &Thumb{
+					Aspect: "poster",
+					URL:    movieDetails.PosterUrlOrig,
+				})
+			}
+			for aspect, url := range art {
+				if aspect == "poster" && hasPoster {
+					// Don't add duplicate posters
+					continue
+				}
+				out = append(out, &Thumb{
+					Aspect: aspect,
+					URL:    url,
+				})
+			}
+			slices.SortFunc(out, func(a, b *Thumb) int {
+				return cmp.Compare(a.Aspect, b.Aspect)
+			})
+			return
+		}(),
 		UniqueIds: func() (out []*UniqueId) {
 			out = [](*UniqueId){
 				{

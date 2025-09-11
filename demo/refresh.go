@@ -1,6 +1,7 @@
 package demo
 
 import (
+	"context"
 	"encoding/xml"
 	"errors"
 	"flag"
@@ -10,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/krelinga/video-in-be/fanart"
 	"github.com/krelinga/video-in-be/ffprobe"
 	"github.com/krelinga/video-in-be/nfo"
 	"github.com/krelinga/video-in-be/tmdb"
@@ -64,7 +66,11 @@ func refresh() error {
 	if err != nil {
 		return err
 	}
-	newNfo, err := nfo.NewMovie(tmdbMovie, probe)
+	art, err := fanart.GetArtURLs(context.Background(), oldNfo.TmdbId)
+	if err != nil {
+		return err
+	}
+	newNfo, err := nfo.NewMovie(tmdbMovie, probe, art)
 	if err != nil {
 		return err
 	}

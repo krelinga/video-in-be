@@ -1,11 +1,13 @@
 package publish
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/krelinga/video-in-be/fanart"
 	"github.com/krelinga/video-in-be/ffprobe"
 	"github.com/krelinga/video-in-be/nfo"
 	"github.com/krelinga/video-in-be/publish/paths"
@@ -100,7 +102,11 @@ func Do(project *state.Project) error {
 	if err != nil {
 		return err
 	}
-	movieNfo, err := nfo.NewMovie(tmdbMovie, probeInfo)
+	art, err := fanart.GetArtURLs(context.TODO(), tmdbMovie.ID)
+	if err != nil {
+		return err
+	}
+	movieNfo, err := nfo.NewMovie(tmdbMovie, probeInfo, art)
 	if err != nil {
 		return err
 	}

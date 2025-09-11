@@ -14,6 +14,7 @@ type MovieSearchResult struct {
 	ID            int
 	OriginalTitle string
 	PosterUrl     string
+	PosterUrlOrig string
 	Title         string
 	RealaseDate   time.Time
 	Overview      string
@@ -161,6 +162,7 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 		return nil, fmt.Errorf("failed to get poster path for movie %d: %v", id, err)
 	} else {
 		out.PosterUrl = getPosterUrl(posterPath)
+		out.PosterUrlOrig = getPosterUrlOrig(posterPath)
 	}
 	if title, err := result.Title(); err != nil {
 		return nil, fmt.Errorf("failed to get title for movie %d: %v", id, err)

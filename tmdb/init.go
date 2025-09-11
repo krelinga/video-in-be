@@ -38,6 +38,17 @@ func getPosterUrl(leaf string) string {
 	}
 }
 
+func getPosterUrlOrig(leaf string) string {
+	// TODO: handle errors instead of returning empty string.
+	if images, err := configuration.Images(); err != nil {
+		return ""
+	} else if baseUrl, err := images.BaseURL(); err != nil {
+		return ""
+	} else {
+		return fmt.Sprintf("%s%s%s", baseUrl, "original", leaf)
+	}
+}
+
 func getProfilePicUrl(leaf string) string {
 	// TODO: handle error instead of returning empty string.
 	const size = "h632"
