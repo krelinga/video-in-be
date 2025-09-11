@@ -10,7 +10,9 @@ type Movie struct {
 	Tagline       string   `xml:"tagline"`
 	Runtime       int      `xml:"runtime"`
 	Thumbs        []*Thumb
-	TmdbId        int `xml:"tmdbid"`
+	MPAA          string `xml:"mpaa,omitempty"`
+	Certification string `xml:"certification,omitempty"`
+	TmdbId        int    `xml:"tmdbid"`
 	UniqueIds     []*UniqueId
 	Genres        []string `xml:"genre"`
 	Directors     []*Director

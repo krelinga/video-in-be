@@ -119,11 +119,12 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 
 type MovieDetails struct {
 	MovieSearchResult
-	Tagline  string
-	Runtime  time.Duration
-	Keywords []string
-	Actors   []*Actor
-	Crew     []*Crew
+	Tagline    string
+	Runtime    time.Duration
+	Keywords   []string
+	Actors     []*Actor
+	Crew       []*Crew
+	MPAARating string
 }
 
 type Actor struct {
@@ -142,7 +143,7 @@ type Crew struct {
 }
 
 func GetMovieDetails(id int) (*MovieDetails, error) {
-	result, err := api.GetMovie(context.Background(), client, int32(id), api.WithAppendToResponse("keywords", "credits"))
+	result, err := api.GetMovie(context.Background(), client, int32(id), api.WithAppendToResponse("keywords", "credits", "release_dates"))
 	if err != nil {
 		return nil, err
 	}
@@ -272,6 +273,26 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 						ID:            int(id),
 					})
 				}
+			}
+		}
+	}
+	if releaseDates, err := result.ReleaseDates(); err != nil {
+	} else if reults, err := releaseDates.Results(); err != nil {
+	} else {
+		for _, r := range reults {
+			if countryCode, err := r.ISO3166_1(); err != nil {
+			} else if countryCode != "US" {
+			} else if releases, err := r.ReleaseDates(); err != nil {
+			} else {
+				for _, release := range releases {
+					if cert, err := release.Certification(); err != nil {
+					} else if cert == "" {
+					} else {
+						out.MPAARating = cert
+						break
+					}
+				}
+				break
 			}
 		}
 	}

@@ -34,6 +34,16 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 			outError = err
 		}
 	}
+
+	mpaaRating := func() string {
+		switch r := movieDetails.MPAARating; r {
+		case "G", "PG", "PG-13", "R", "NC-17":
+			return fmt.Sprintf("US:%s / US:Rated %s", r, r)
+		default:
+			return r
+		}
+	}()
+
 	// Create a new Movie
 	outMovie = &Movie{
 		Title:         movieDetails.Title,
@@ -68,6 +78,8 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 			})
 			return
 		}(),
+		MPAA:          mpaaRating,
+		Certification: mpaaRating,
 		UniqueIds: func() (out []*UniqueId) {
 			out = [](*UniqueId){
 				{
