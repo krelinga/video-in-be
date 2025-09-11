@@ -20,6 +20,7 @@ type Movie struct {
 	Tags          []string `xml:"tag"`
 	Actors        []*Actor
 	Producers     []*Producer
+	Languages     string `xml:"languages,omitempty"`
 	FileInfo      *FileInfo
 }
 

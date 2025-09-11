@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"slices"
+	"strings"
 
 	"github.com/krelinga/video-in-be/fanart"
 	"github.com/krelinga/video-in-be/ffprobe"
@@ -209,6 +210,9 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 				}),
 			},
 		},
+		Languages: func() string {
+			return strings.Join(movieDetails.SpokenLanguages, ", ")
+		}(),
 	}
 
 	if outError != nil {
