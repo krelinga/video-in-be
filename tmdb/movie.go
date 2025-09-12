@@ -128,6 +128,8 @@ type MovieDetails struct {
 	SpokenLanguages     []string
 	ProductionCompanies []string
 	ProductionCountries []string
+	VoteAverage         float64
+	VoteCount           int
 }
 
 type Actor struct {
@@ -320,6 +322,9 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 			}
 		}
 	}
+	out.VoteAverage, _ = zeroDefault(result.VoteAverage())
+	voteCount, _ := zeroDefault(result.VoteCount())
+	out.VoteCount = int(voteCount)
 
 	return out, nil
 }

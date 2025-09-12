@@ -5,6 +5,7 @@ type Movie struct {
 	Title         string   `xml:"title"`
 	OriginalTitle string   `xml:"originaltitle"`
 	Year          int      `xml:"year"`
+	Ratings       *Ratings `xml:"ratings,omitempty"`
 	Plot          string   `xml:"plot"`
 	Outline       string   `xml:"outline"`
 	Tagline       string   `xml:"tagline"`
@@ -102,4 +103,17 @@ type Credit struct {
 	XMLName struct{} `xml:"credits"`
 	Name    string   `xml:",chardata"`
 	TMDBID  string   `xml:"tmdbid,attr,omitempty"`
+}
+
+type Rating struct {
+	XMLName struct{} `xml:"rating"`
+	Default bool     `xml:"default,attr"`
+	Max     int      `xml:"max,attr,omitempty"`
+	Name    string   `xml:"name,attr,omitempty"`
+	Value   float64  `xml:"value,omitempty"`
+	Votes   int      `xml:"votes,omitempty"`
+}
+
+type Ratings struct {
+	Ratings []*Rating `xml:"rating"`
 }

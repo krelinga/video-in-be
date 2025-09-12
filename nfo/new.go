@@ -235,6 +235,20 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 			return
 		}(),
 		DateAdded: time.Now().Format(time.DateTime),
+		Ratings: func() (out *Ratings) {
+			if movieDetails.VoteAverage > 0 && movieDetails.VoteCount > 0 {
+				out = &Ratings{
+					Ratings: []*Rating{{
+						Default: false,
+						Max:     10,
+						Name:    "themoviedb",
+						Value:   movieDetails.VoteAverage,
+						Votes:   movieDetails.VoteCount,
+					}},
+				}
+			}
+			return
+		}(),
 	}
 
 	if outError != nil {
