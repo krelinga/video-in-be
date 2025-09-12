@@ -54,6 +54,14 @@ func zeroDefault[T any](in T, err error) (T, error) {
 	return in, err
 }
 
+func zeroError[T any](in T, err error) T {
+	if err != nil {
+		var zero T
+		return zero
+	}
+	return in
+}
+
 func SearchMovies(query string) ([]*MovieSearchResult, error) {
 	// Search for movies
 	result, err := api.SearchMovie(context.Background(), client, query)
@@ -130,6 +138,7 @@ type MovieDetails struct {
 	ProductionCountries []string
 	VoteAverage         float64
 	VoteCount           int
+	Collection          *Collection
 }
 
 type Actor struct {
@@ -147,10 +156,25 @@ type Crew struct {
 	ID            int
 }
 
+type Collection struct {
+	Name     string
+	Overview string
+}
+
 func GetMovieDetails(id int) (*MovieDetails, error) {
 	result, err := api.GetMovie(context.Background(), client, int32(id), api.WithAppendToResponse("keywords", "credits", "release_dates"))
 	if err != nil {
 		return nil, err
+	}
+
+	var collection api.Collection
+	if btc, err := result.BelongsToCollection(); err != nil {
+	} else if id, err := btc.ID(); err != nil {
+	} else {
+		collection, err = api.GetCollection(context.Background(), client, id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get collection %d for movie %d: %v", id, id, err)
+		}
 	}
 
 	out := &MovieDetails{}
@@ -325,6 +349,12 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 	out.VoteAverage, _ = zeroDefault(result.VoteAverage())
 	voteCount, _ := zeroDefault(result.VoteCount())
 	out.VoteCount = int(voteCount)
+	if collection != nil {
+		out.Collection = &Collection{
+			Name:     zeroError(collection.Name()),
+			Overview: zeroError(collection.Overview()),
+		}
+	}
 
 	return out, nil
 }

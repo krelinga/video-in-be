@@ -249,6 +249,15 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 			}
 			return
 		}(),
+		Set: func() (out *Set) {
+			if movieDetails.Collection != nil {
+				out = &Set{
+					Name:     movieDetails.Collection.Name,
+					Overview: movieDetails.Collection.Overview,
+				}
+			}
+			return
+		}(),
 	}
 
 	if outError != nil {

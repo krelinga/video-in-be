@@ -6,6 +6,7 @@ type Movie struct {
 	OriginalTitle string   `xml:"originaltitle"`
 	Year          int      `xml:"year"`
 	Ratings       *Ratings `xml:"ratings,omitempty"`
+	Set           *Set     `xml:"set,omitempty"`
 	Plot          string   `xml:"plot"`
 	Outline       string   `xml:"outline"`
 	Tagline       string   `xml:"tagline"`
@@ -116,4 +117,9 @@ type Rating struct {
 
 type Ratings struct {
 	Ratings []*Rating `xml:"rating"`
+}
+
+type Set struct {
+	Name     string `xml:"name,omitempty"`
+	Overview string `xml:"overview,omitempty"`
 }

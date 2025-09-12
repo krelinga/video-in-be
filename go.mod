@@ -9,7 +9,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/google/uuid v1.6.0
 	github.com/krelinga/go-fanart v0.1.0
-	github.com/krelinga/go-tmdb v0.3.0
+	github.com/krelinga/go-tmdb v0.3.2
 	golang.org/x/net v0.40.0
 )
 
