@@ -1,11 +1,15 @@
 package nfo
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"log"
 	"slices"
+	"strings"
+	"time"
 
+	"github.com/krelinga/video-in-be/fanart"
 	"github.com/krelinga/video-in-be/ffprobe"
 	"github.com/krelinga/video-in-be/tmdb"
 )
@@ -26,12 +30,22 @@ func translateCodec(codec string) (string, error) {
 	return "", fmt.Errorf("unknown codec: %q", codec)
 }
 
-func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outMovie *Movie, outError error) {
+func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art fanart.ArtURLs) (outMovie *Movie, outError error) {
 	setError := func(err error) {
 		if outError == nil {
 			outError = err
 		}
 	}
+
+	mpaaRating := func() string {
+		switch r := movieDetails.MPAARating; r {
+		case "G", "PG", "PG-13", "R", "NC-17":
+			return fmt.Sprintf("US:%s / US:Rated %s", r, r)
+		default:
+			return r
+		}
+	}()
+
 	// Create a new Movie
 	outMovie = &Movie{
 		Title:         movieDetails.Title,
@@ -42,6 +56,41 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 		Tagline:       movieDetails.Tagline,
 		Runtime:       int(movieDetails.Runtime.Minutes()),
 		TmdbId:        int(movieDetails.ID),
+		Thumbs: func() (out []*Thumb) {
+			hasPoster := false
+			hasLogo := false
+			if movieDetails.PosterUrl != "" {
+				hasPoster = true
+				out = append(out, &Thumb{
+					Aspect: "poster",
+					URL:    movieDetails.PosterUrlOrig,
+				})
+			}
+			for aspect, url := range art {
+				if aspect == "poster" && hasPoster {
+					// Don't add duplicate posters
+					continue
+				}
+				hasLogo = hasLogo || aspect == "logo"
+				out = append(out, &Thumb{
+					Aspect: aspect,
+					URL:    url,
+				})
+			}
+			if !hasLogo && movieDetails.LogoUrl != "" {
+				out = append(out, &Thumb{
+					Aspect: "logo",
+					URL:    movieDetails.LogoUrl,
+				})
+			}
+			slices.SortFunc(out, func(a, b *Thumb) int {
+				return cmp.Compare(a.Aspect, b.Aspect)
+			})
+			return
+		}(),
+		MPAA:          mpaaRating,
+		Certification: mpaaRating,
+		ID:            movieDetails.ImdbID,
 		UniqueIds: func() (out []*UniqueId) {
 			out = [](*UniqueId){
 				{
@@ -103,6 +152,7 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 						Name:    crew.Name,
 						Profile: fmt.Sprintf("https://www.themoviedb.org/person/%d", crew.ID),
 						TmdbId:  crew.ID,
+						Thumb:   crew.ProfilePicUrl,
 					})
 				}
 			}
@@ -170,6 +220,52 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe) (outM
 				}),
 			},
 		},
+		Languages: func() string {
+			return strings.Join(movieDetails.SpokenLanguages, ", ")
+		}(),
+		Studios: movieDetails.ProductionCompanies,
+		Premiered: func() string {
+			if !movieDetails.RealaseDate.IsZero() {
+				return movieDetails.RealaseDate.Format(time.DateOnly)
+			}
+			return ""
+		}(),
+		Countries: movieDetails.ProductionCountries,
+		Credits: func() (out []*Credit) {
+			for _, crew := range movieDetails.Crew {
+				if crew.Department == "Writing" {
+					out = append(out, &Credit{
+						Name:   crew.Name,
+						TMDBID: fmt.Sprintf("%d", crew.ID),
+					})
+				}
+			}
+			return
+		}(),
+		DateAdded: time.Now().Format(time.DateTime),
+		Ratings: func() (out *Ratings) {
+			if movieDetails.VoteAverage > 0 && movieDetails.VoteCount > 0 {
+				out = &Ratings{
+					Ratings: []*Rating{{
+						Default: false,
+						Max:     10,
+						Name:    "themoviedb",
+						Value:   movieDetails.VoteAverage,
+						Votes:   movieDetails.VoteCount,
+					}},
+				}
+			}
+			return
+		}(),
+		Set: func() (out *Set) {
+			if movieDetails.Collection != nil {
+				out = &Set{
+					Name:     movieDetails.Collection.Name,
+					Overview: movieDetails.Collection.Overview,
+				}
+			}
+			return
+		}(),
 	}
 
 	if outError != nil {

@@ -22,6 +22,7 @@ mkdir -p $VIDEOIN_THUMBSDIR
 export VIDEOIN_LIBRARYDIR=$rootdir/library
 mkdir -p $VIDEOIN_LIBRARYDIR
 source tmdb_key.sh
+source fanart_key.sh
 
 docker build -t video-in-be .
 docker run --rm \
@@ -33,4 +34,5 @@ docker run --rm \
     --env VIDEOIN_PROJECTDIR \
     --env VIDEOIN_THUMBSDIR \
     --env VIDEOIN_LIBRARYDIR \
+    --env VIDEOIN_FANARTAPIKEY \
     -it -p 25004:25004 --name video-in-be video-in-be "${@}"

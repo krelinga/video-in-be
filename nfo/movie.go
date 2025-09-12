@@ -5,17 +5,29 @@ type Movie struct {
 	Title         string   `xml:"title"`
 	OriginalTitle string   `xml:"originaltitle"`
 	Year          int      `xml:"year"`
+	Ratings       *Ratings `xml:"ratings,omitempty"`
+	Set           *Set     `xml:"set,omitempty"`
 	Plot          string   `xml:"plot"`
 	Outline       string   `xml:"outline"`
 	Tagline       string   `xml:"tagline"`
 	Runtime       int      `xml:"runtime"`
-	TmdbId        int      `xml:"tmdbid"`
+	Thumbs        []*Thumb
+	MPAA          string `xml:"mpaa,omitempty"`
+	Certification string `xml:"certification,omitempty"`
+	ID            string `xml:"id,omitempty"`
+	TmdbId        int    `xml:"tmdbid"`
 	UniqueIds     []*UniqueId
+	Countries     []string `xml:"country"`
+	Premiered     string   `xml:"premiered,omitempty"`
 	Genres        []string `xml:"genre"`
+	Studios       []string `xml:"studio"`
+	Credits       []*Credit
 	Directors     []*Director
 	Tags          []string `xml:"tag"`
 	Actors        []*Actor
 	Producers     []*Producer
+	Languages     string `xml:"languages,omitempty"`
+	DateAdded     string `xml:"dateadded,omitempty"`
 	FileInfo      *FileInfo
 }
 
@@ -79,4 +91,35 @@ type Producer struct {
 	Name    string   `xml:"name"`
 	Profile string   `xml:"profile"`
 	TmdbId  int      `xml:"tmdbid,attr"`
+	Thumb   string   `xml:"thumb,omitempty"`
+}
+
+type Thumb struct {
+	XMLName struct{} `xml:"thumb"`
+	Aspect  string   `xml:"aspect,omitempty,attr"`
+	URL     string   `xml:",chardata"`
+}
+
+type Credit struct {
+	XMLName struct{} `xml:"credits"`
+	Name    string   `xml:",chardata"`
+	TMDBID  string   `xml:"tmdbid,attr,omitempty"`
+}
+
+type Rating struct {
+	XMLName struct{} `xml:"rating"`
+	Default bool     `xml:"default,attr"`
+	Max     int      `xml:"max,attr,omitempty"`
+	Name    string   `xml:"name,attr,omitempty"`
+	Value   float64  `xml:"value,omitempty"`
+	Votes   int      `xml:"votes,omitempty"`
+}
+
+type Ratings struct {
+	Ratings []*Rating `xml:"rating"`
+}
+
+type Set struct {
+	Name     string `xml:"name,omitempty"`
+	Overview string `xml:"overview,omitempty"`
 }

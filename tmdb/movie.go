@@ -1,10 +1,12 @@
 package tmdb
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
 	"log"
+	"slices"
 	"time"
 
 	api "github.com/krelinga/go-tmdb"
@@ -14,6 +16,7 @@ type MovieSearchResult struct {
 	ID            int
 	OriginalTitle string
 	PosterUrl     string
+	PosterUrlOrig string
 	Title         string
 	RealaseDate   time.Time
 	Overview      string
@@ -51,6 +54,14 @@ func zeroDefault[T any](in T, err error) (T, error) {
 		return zero, nil
 	}
 	return in, err
+}
+
+func zeroError[T any](in T, err error) T {
+	if err != nil {
+		var zero T
+		return zero
+	}
+	return in
 }
 
 func SearchMovies(query string) ([]*MovieSearchResult, error) {
@@ -118,11 +129,19 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 
 type MovieDetails struct {
 	MovieSearchResult
-	Tagline  string
-	Runtime  time.Duration
-	Keywords []string
-	Actors   []*Actor
-	Crew     []*Crew
+	Tagline             string
+	Runtime             time.Duration
+	Keywords            []string
+	Actors              []*Actor
+	Crew                []*Crew
+	MPAARating          string
+	SpokenLanguages     []string
+	ProductionCompanies []string
+	ProductionCountries []string
+	VoteAverage         float64
+	VoteCount           int
+	Collection          *Collection
+	LogoUrl             string
 }
 
 type Actor struct {
@@ -140,10 +159,25 @@ type Crew struct {
 	ID            int
 }
 
+type Collection struct {
+	Name     string
+	Overview string
+}
+
 func GetMovieDetails(id int) (*MovieDetails, error) {
-	result, err := api.GetMovie(context.Background(), client, int32(id), api.WithAppendToResponse("keywords", "credits"))
+	result, err := api.GetMovie(context.Background(), client, int32(id), api.WithAppendToResponse("keywords", "credits", "release_dates", "images"))
 	if err != nil {
 		return nil, err
+	}
+
+	var collection api.Collection
+	if btc, err := result.BelongsToCollection(); err != nil {
+	} else if id, err := btc.ID(); err != nil {
+	} else {
+		collection, err = api.GetCollection(context.Background(), client, id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get collection %d for movie %d: %v", id, id, err)
+		}
 	}
 
 	out := &MovieDetails{}
@@ -161,6 +195,7 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 		return nil, fmt.Errorf("failed to get poster path for movie %d: %v", id, err)
 	} else {
 		out.PosterUrl = getPosterUrl(posterPath)
+		out.PosterUrlOrig = getPosterUrlOrig(posterPath)
 	}
 	if title, err := result.Title(); err != nil {
 		return nil, fmt.Errorf("failed to get title for movie %d: %v", id, err)
@@ -273,5 +308,97 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 			}
 		}
 	}
+	if releaseDates, err := result.ReleaseDates(); err != nil {
+	} else if reults, err := releaseDates.Results(); err != nil {
+	} else {
+		for _, r := range reults {
+			if countryCode, err := r.ISO3166_1(); err != nil {
+			} else if countryCode != "US" {
+			} else if releases, err := r.ReleaseDates(); err != nil {
+			} else {
+				for _, release := range releases {
+					if cert, err := release.Certification(); err != nil {
+					} else if cert == "" {
+					} else {
+						out.MPAARating = cert
+						break
+					}
+				}
+				break
+			}
+		}
+	}
+	if spokenLanguages, err := result.SpokenLanguages(); err == nil {
+		for _, sl := range spokenLanguages {
+			if name, err := sl.EnglishName(); err == nil {
+				out.SpokenLanguages = append(out.SpokenLanguages, name)
+			}
+		}
+	}
+	if pcs, err := result.ProductionCompanies(); err == nil {
+		for _, pc := range pcs {
+			if name, err := zeroDefault(pc.Name()); err == nil {
+				out.ProductionCompanies = append(out.ProductionCompanies, name)
+			}
+		}
+	}
+	if pcs, err := result.ProductionCountries(); err == nil {
+		for _, pc := range pcs {
+			if name, err := pc.Name(); err == nil {
+				out.ProductionCountries = append(out.ProductionCountries, name)
+			}
+		}
+	}
+	out.VoteAverage, _ = zeroDefault(result.VoteAverage())
+	voteCount, _ := zeroDefault(result.VoteCount())
+	out.VoteCount = int(voteCount)
+	if collection != nil {
+		out.Collection = &Collection{
+			Name:     zeroError(collection.Name()),
+			Overview: zeroError(collection.Overview()),
+		}
+	}
+	out.LogoUrl = func() string {
+		logos := zeroError(zeroError(result.Images()).Logos())
+		type sortableLogo struct {
+			urlSuffix   string
+			langSortKey int
+			origOrder   int
+		}
+		sortableLogos := make([]sortableLogo, 0, len(logos))
+		for i, logo := range logos {
+			urlSuffix := zeroError(logo.FilePath())
+			if urlSuffix == "" {
+				continue
+			}
+			var langSortKey int
+			switch lang := zeroError(logo.ISO639_1()); lang {
+			case "en":
+				langSortKey = 0
+			case "":
+				langSortKey = 1
+			default:
+				langSortKey = 2
+			}
+			sortableLogos = append(sortableLogos, sortableLogo{
+				urlSuffix:   urlSuffix,
+				langSortKey: langSortKey,
+				origOrder:   i,
+			})
+		}
+		slices.SortFunc(sortableLogos, func(a, b sortableLogo) int {
+			if result := cmp.Compare(a.langSortKey, b.langSortKey); result != 0 {
+				return result
+			}
+			return cmp.Compare(a.origOrder, b.origOrder)
+		})
+		if len(sortableLogos) == 0 {
+			return ""
+		} else {
+			// TODO: this could use a better name ... the function actually works for any kind of image, not just posters.
+			return getPosterUrlOrig(sortableLogos[0].urlSuffix)
+		}
+	}()
+
 	return out, nil
 }

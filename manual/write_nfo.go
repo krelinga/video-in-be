@@ -1,12 +1,14 @@
 package manual
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
+	"github.com/krelinga/video-in-be/fanart"
 	"github.com/krelinga/video-in-be/ffprobe"
 	"github.com/krelinga/video-in-be/nfo"
 	"github.com/krelinga/video-in-be/tmdb"
@@ -75,7 +77,11 @@ func writeNfo() error {
 	if err != nil {
 		return err
 	}
-	movieNfo, err := nfo.NewMovie(details, probeInfo)
+	art, err := fanart.GetArtURLs(context.Background(), movieId)
+	if err != nil {
+		return err
+	}
+	movieNfo, err := nfo.NewMovie(details, probeInfo, art)
 	if err != nil {
 		return err
 	}

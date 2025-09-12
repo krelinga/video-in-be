@@ -57,6 +57,7 @@ func TestEndToEndServer(t *testing.T) {
 			"VIDEOIN_THUMBSDIR":    "/tmp/thumbs",
 			"VIDEOIN_TMDBKEY":      "test-key",
 			"VIDEOIN_LIBRARYDIR":   "/tmp/library",
+			"VIDEOIN_FANARTAPIKEY": "test-key",
 		},
 		Cmd:        []string{"-mode", "server"},
 		WaitingFor: wait.ForLog("Hello, World!").WithStartupTimeout(30 * time.Second),

@@ -26,3 +26,6 @@ go.work.sum
 
 # TMDb API key
 tmdb_key.sh
+
+# Fanart API key
+fanart_key.sh
