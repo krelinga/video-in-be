@@ -221,6 +221,7 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 			}
 			return ""
 		}(),
+		Countries: movieDetails.ProductionCountries,
 	}
 
 	if outError != nil {

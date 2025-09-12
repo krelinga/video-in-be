@@ -127,6 +127,7 @@ type MovieDetails struct {
 	MPAARating          string
 	SpokenLanguages     []string
 	ProductionCompanies []string
+	ProductionCountries []string
 }
 
 type Actor struct {
@@ -309,6 +310,13 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 		for _, pc := range pcs {
 			if name, err := zeroDefault(pc.Name()); err == nil {
 				out.ProductionCompanies = append(out.ProductionCompanies, name)
+			}
+		}
+	}
+	if pcs, err := result.ProductionCountries(); err == nil {
+		for _, pc := range pcs {
+			if name, err := pc.Name(); err == nil {
+				out.ProductionCountries = append(out.ProductionCountries, name)
 			}
 		}
 	}
