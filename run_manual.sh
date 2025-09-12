@@ -25,4 +25,10 @@ DOCKER_RUN_RESULT=$?
 
 delete_docker_image
 
+if [ $DOCKER_RUN_RESULT -ne 0 ]; then
+    echo "Docker run failed with exit code $DOCKER_RUN_RESULT"
+else 
+    echo "Docker run completed successfully"
+fi
+
 exit $DOCKER_RUN_RESULT
