@@ -16,6 +16,7 @@ type Movie struct {
 	TmdbId        int    `xml:"tmdbid"`
 	UniqueIds     []*UniqueId
 	Genres        []string `xml:"genre"`
+	Studios       []string `xml:"studio"`
 	Directors     []*Director
 	Tags          []string `xml:"tag"`
 	Actors        []*Actor

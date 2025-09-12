@@ -119,13 +119,14 @@ func SearchMovies(query string) ([]*MovieSearchResult, error) {
 
 type MovieDetails struct {
 	MovieSearchResult
-	Tagline         string
-	Runtime         time.Duration
-	Keywords        []string
-	Actors          []*Actor
-	Crew            []*Crew
-	MPAARating      string
-	SpokenLanguages []string
+	Tagline             string
+	Runtime             time.Duration
+	Keywords            []string
+	Actors              []*Actor
+	Crew                []*Crew
+	MPAARating          string
+	SpokenLanguages     []string
+	ProductionCompanies []string
 }
 
 type Actor struct {
@@ -301,6 +302,13 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 		for _, sl := range spokenLanguages {
 			if name, err := sl.EnglishName(); err == nil {
 				out.SpokenLanguages = append(out.SpokenLanguages, name)
+			}
+		}
+	}
+	if pcs, err := result.ProductionCompanies(); err == nil {
+		for _, pc := range pcs {
+			if name, err := zeroDefault(pc.Name()); err == nil {
+				out.ProductionCompanies = append(out.ProductionCompanies, name)
 			}
 		}
 	}

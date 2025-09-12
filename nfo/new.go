@@ -213,6 +213,7 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 		Languages: func() string {
 			return strings.Join(movieDetails.SpokenLanguages, ", ")
 		}(),
+		Studios: movieDetails.ProductionCompanies,
 	}
 
 	if outError != nil {
