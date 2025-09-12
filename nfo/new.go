@@ -222,6 +222,17 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 			return ""
 		}(),
 		Countries: movieDetails.ProductionCountries,
+		Credits: func() (out []*Credit) {
+			for _, crew := range movieDetails.Crew {
+				if crew.Department == "Writing" {
+					out = append(out, &Credit{
+						Name:   crew.Name,
+						TMDBID: fmt.Sprintf("%d", crew.ID),
+					})
+				}
+			}
+			return
+		}(),
 	}
 
 	if outError != nil {

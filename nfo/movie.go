@@ -19,6 +19,7 @@ type Movie struct {
 	Premiered     string   `xml:"premiered,omitempty"`
 	Genres        []string `xml:"genre"`
 	Studios       []string `xml:"studio"`
+	Credits       []*Credit
 	Directors     []*Director
 	Tags          []string `xml:"tag"`
 	Actors        []*Actor
@@ -93,4 +94,10 @@ type Thumb struct {
 	XMLName struct{} `xml:"thumb"`
 	Aspect  string   `xml:"aspect,omitempty,attr"`
 	URL     string   `xml:",chardata"`
+}
+
+type Credit struct {
+	XMLName struct{} `xml:"credits"`
+	Name    string   `xml:",chardata"`
+	TMDBID  string   `xml:"tmdbid,attr,omitempty"`
 }
