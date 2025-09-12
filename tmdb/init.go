@@ -29,7 +29,9 @@ func imageUrl(base, size, leaf string) string {
 func getPosterUrl(leaf string) string {
 	// TODO: handle errors instead of returning empty string.
 	const offset = 4
-	if images, err := configuration.Images(); err != nil {
+	if len(leaf) == 0 {
+		return ""
+	} else if images, err := configuration.Images(); err != nil {
 		return ""
 	} else if baseUrl, err := images.BaseURL(); err != nil {
 		return ""
@@ -44,7 +46,9 @@ func getPosterUrl(leaf string) string {
 
 func getPosterUrlOrig(leaf string) string {
 	// TODO: handle errors instead of returning empty string.
-	if images, err := configuration.Images(); err != nil {
+	if len(leaf) == 0 {
+		return ""
+	} else if images, err := configuration.Images(); err != nil {
 		return ""
 	} else if baseUrl, err := images.BaseURL(); err != nil {
 		return ""
@@ -56,7 +60,9 @@ func getPosterUrlOrig(leaf string) string {
 func getProfilePicUrl(leaf string) string {
 	// TODO: handle error instead of returning empty string.
 	const size = "h632"
-	if images, err := configuration.Images(); err != nil {
+	if len(leaf) == 0 {
+		return ""
+	} else if images, err := configuration.Images(); err != nil {
 		return ""
 	} else if profileSizes, err := images.ProfileSizes(); err != nil {
 		return ""

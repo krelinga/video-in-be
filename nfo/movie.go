@@ -89,6 +89,7 @@ type Producer struct {
 	Name    string   `xml:"name"`
 	Profile string   `xml:"profile"`
 	TmdbId  int      `xml:"tmdbid,attr"`
+	Thumb   string   `xml:"thumb,omitempty"`
 }
 
 type Thumb struct {

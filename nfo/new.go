@@ -144,6 +144,7 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 						Name:    crew.Name,
 						Profile: fmt.Sprintf("https://www.themoviedb.org/person/%d", crew.ID),
 						TmdbId:  crew.ID,
+						Thumb:   crew.ProfilePicUrl,
 					})
 				}
 			}
