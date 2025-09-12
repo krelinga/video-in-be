@@ -58,6 +58,7 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 		TmdbId:        int(movieDetails.ID),
 		Thumbs: func() (out []*Thumb) {
 			hasPoster := false
+			hasLogo := false
 			if movieDetails.PosterUrl != "" {
 				hasPoster = true
 				out = append(out, &Thumb{
@@ -70,9 +71,16 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 					// Don't add duplicate posters
 					continue
 				}
+				hasLogo = hasLogo || aspect == "logo"
 				out = append(out, &Thumb{
 					Aspect: aspect,
 					URL:    url,
+				})
+			}
+			if !hasLogo && movieDetails.LogoUrl != "" {
+				out = append(out, &Thumb{
+					Aspect: "logo",
+					URL:    movieDetails.LogoUrl,
 				})
 			}
 			slices.SortFunc(out, func(a, b *Thumb) int {

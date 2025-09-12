@@ -1,10 +1,12 @@
 package tmdb
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
 	"log"
+	"slices"
 	"time"
 
 	api "github.com/krelinga/go-tmdb"
@@ -139,6 +141,7 @@ type MovieDetails struct {
 	VoteAverage         float64
 	VoteCount           int
 	Collection          *Collection
+	LogoUrl             string
 }
 
 type Actor struct {
@@ -162,7 +165,7 @@ type Collection struct {
 }
 
 func GetMovieDetails(id int) (*MovieDetails, error) {
-	result, err := api.GetMovie(context.Background(), client, int32(id), api.WithAppendToResponse("keywords", "credits", "release_dates"))
+	result, err := api.GetMovie(context.Background(), client, int32(id), api.WithAppendToResponse("keywords", "credits", "release_dates", "images"))
 	if err != nil {
 		return nil, err
 	}
@@ -355,6 +358,47 @@ func GetMovieDetails(id int) (*MovieDetails, error) {
 			Overview: zeroError(collection.Overview()),
 		}
 	}
+	out.LogoUrl = func() string {
+		logos := zeroError(zeroError(result.Images()).Logos())
+		type sortableLogo struct {
+			urlSuffix   string
+			langSortKey int
+			origOrder   int
+		}
+		sortableLogos := make([]sortableLogo, 0, len(logos))
+		for i, logo := range logos {
+			urlSuffix := zeroError(logo.FilePath())
+			if urlSuffix == "" {
+				continue
+			}
+			var langSortKey int
+			switch lang := zeroError(logo.ISO639_1()); lang {
+			case "en":
+				langSortKey = 0
+			case "":
+				langSortKey = 1
+			default:
+				langSortKey = 2
+			}
+			sortableLogos = append(sortableLogos, sortableLogo{
+				urlSuffix:   urlSuffix,
+				langSortKey: langSortKey,
+				origOrder:   i,
+			})
+		}
+		slices.SortFunc(sortableLogos, func(a, b sortableLogo) int {
+			if result := cmp.Compare(a.langSortKey, b.langSortKey); result != 0 {
+				return result
+			}
+			return cmp.Compare(a.origOrder, b.origOrder)
+		})
+		if len(sortableLogos) == 0 {
+			return ""
+		} else {
+			// TODO: this could use a better name ... the function actually works for any kind of image, not just posters.
+			return getPosterUrlOrig(sortableLogos[0].urlSuffix)
+		}
+	}()
 
 	return out, nil
 }
