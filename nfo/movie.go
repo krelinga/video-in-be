@@ -15,6 +15,7 @@ type Movie struct {
 	ID            string `xml:"id,omitempty"`
 	TmdbId        int    `xml:"tmdbid"`
 	UniqueIds     []*UniqueId
+	Premiered     string   `xml:"premiered,omitempty"`
 	Genres        []string `xml:"genre"`
 	Studios       []string `xml:"studio"`
 	Directors     []*Director

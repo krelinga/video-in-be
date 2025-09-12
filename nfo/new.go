@@ -7,6 +7,7 @@ import (
 	"log"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/krelinga/video-in-be/fanart"
 	"github.com/krelinga/video-in-be/ffprobe"
@@ -214,6 +215,12 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 			return strings.Join(movieDetails.SpokenLanguages, ", ")
 		}(),
 		Studios: movieDetails.ProductionCompanies,
+		Premiered: func() string {
+			if !movieDetails.RealaseDate.IsZero() {
+				return movieDetails.RealaseDate.Format(time.DateOnly)
+			}
+			return ""
+		}(),
 	}
 
 	if outError != nil {
