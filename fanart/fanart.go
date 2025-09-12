@@ -3,7 +3,9 @@ package fanart
 import (
 	"cmp"
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"slices"
 	"strconv"
 
@@ -20,6 +22,13 @@ var client fanart.Client = func() fanart.Client {
 
 type ArtURLs map[string]string
 
+func errorGet[T error](err error) (specificError T, ok bool) {
+	if errors.As(err, &specificError) {
+		ok = true
+	}
+	return
+}
+
 func GetArtURLs(ctx context.Context, tmdbId int) (ArtURLs, error) {
 	if env.FanartKey() == "test-key" {
 		// In test mode, don't call the fanart api.
@@ -27,7 +36,9 @@ func GetArtURLs(ctx context.Context, tmdbId int) (ArtURLs, error) {
 	}
 
 	result, err := fanart.GetMovie(ctx, client, fmt.Sprintf("%d", tmdbId))
-	if err != nil {
+	if statusCodeError, ok := errorGet[fanart.HttpStatusCodeError](err); ok && statusCodeError.StatusCode == http.StatusNotFound {
+		return ArtURLs{}, nil
+	} else if err != nil {
 		return nil, err
 	}
 
