@@ -233,6 +233,7 @@ func NewMovie(movieDetails *tmdb.MovieDetails, probeInfo *ffprobe.FFProbe, art f
 			}
 			return
 		}(),
+		DateAdded: time.Now().Format(time.DateTime),
 	}
 
 	if outError != nil {

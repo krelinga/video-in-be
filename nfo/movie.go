@@ -25,6 +25,7 @@ type Movie struct {
 	Actors        []*Actor
 	Producers     []*Producer
 	Languages     string `xml:"languages,omitempty"`
+	DateAdded     string `xml:"dateadded,omitempty"`
 	FileInfo      *FileInfo
 }
 
