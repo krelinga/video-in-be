@@ -16,8 +16,8 @@ github.com/krelinga/go-fanart v0.1.1 h1:fAgLzmcMnqUIzLMxoRRNokihIM0LjpKqr37wGoF9
 github.com/krelinga/go-fanart v0.1.1/go.mod h1:9xCNuWBQUgiiUaWO3zGeHEcAgsf2bkFRHHJIcY8r/HY=
 github.com/krelinga/go-jsonflex v0.2.1 h1:TXMrmDQgymgMkHW/Q/B9+R9lMrlVoZCGIt45d+bgtDk=
 github.com/krelinga/go-jsonflex v0.2.1/go.mod h1:uUz8DcWiVVAVZyPwuSYxEGNr12dmwovARjMH4ZGlhx0=
-github.com/krelinga/go-tmdb v0.3.2 h1:FaTjsCR9aPdcLn7BAvUCwVIljeQfpSMwkSltxpZJVAo=
-github.com/krelinga/go-tmdb v0.3.2/go.mod h1:xqL2Mf23N2Sa2rBoRziw4SrdgMFtOoigN6aQWBq+MQA=
+github.com/krelinga/go-tmdb v0.3.3 h1:tuCjJCNZbP+BbTNF8v+gmzpnE4n6CwQlwnoUmXEAhj4=
+github.com/krelinga/go-tmdb v0.3.3/go.mod h1:xqL2Mf23N2Sa2rBoRziw4SrdgMFtOoigN6aQWBq+MQA=
 golang.org/x/net v0.40.0 h1:79Xs7wF06Gbdcg4kdCCIQArK11Z1hr5POQ6+fIYHNuY=
 golang.org/x/net v0.40.0/go.mod h1:y0hY0exeL2Pku80/zKK7tpntoX23cqL3Oa6njdgRtds=
 golang.org/x/text v0.25.0 h1:qVyWApTSYLk/drJRO5mDlNYskwQznZmkpV2c8q9zls4=
