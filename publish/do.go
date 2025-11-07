@@ -49,7 +49,7 @@ func Do(project *state.Project) error {
 
 	tmdbMovie, err := tmdb.GetMovieDetails(project.TmdbId)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not get TMDB movie details: %w", err)
 	}
 
 	p := paths.New(tmdbMovie)
@@ -61,7 +61,7 @@ func Do(project *state.Project) error {
 			if os.IsExist(err) {
 				continue
 			}
-			return err
+			return fmt.Errorf("could not create directory %s: %w", dir, err)
 		}
 	}
 
@@ -100,24 +100,24 @@ func Do(project *state.Project) error {
 	// Generate NFO
 	probeInfo, err := ffprobe.New(mainPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create ffprobe instance: %w", err)
 	}
 	art, err := fanart.GetArtURLs(context.TODO(), tmdbMovie.ID)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not get fanart URLs: %w", err)
 	}
 	movieNfo, err := nfo.NewMovie(tmdbMovie, probeInfo, art)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create movie NFO data: %w", err)
 	}
 	err = func() error {
 		f, err := os.Create(p.Main(".nfo"))
 		if err != nil {
-			return err
+			return fmt.Errorf("could not create NFO file: %w", err)
 		}
 		defer f.Close()
 		if err := movieNfo.Write(f); err != nil {
-			return err
+			return fmt.Errorf("could not write NFO file: %w", err)
 		}
 		return nil
 	}()
